@@ -1,22 +1,36 @@
 <template>
   <div class="home">
-    <!-- 如果直接使用assets/images/1.png会将assets认作一个字符串,而不是变量(别名) -->
-    <img src="~assets/images/1.png" alt="" id="demo" />
-
-    <p class="demoWords">something</p>
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+    {{banner}}
   </div>
-</template>
+</template> 
 
 <script>
-// @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
+import { ref, onMounted } from "vue";
+import { getHomeAllData, getBanner } from "network/home.js";
 
 export default {
   name: "HomeView",
-  components: {
-    HelloWorld,
+  setup() {
+    const banner = ref([]);
+
+    onMounted(() => {
+      // console.log("11111111111");
+
+      getHomeAllData()
+        .then((res) => {
+
+          banner.value = res.slides;
+
+        })
+        .catch((err) => {});
+    });
+
+    return {
+      banner,
+    };
   },
+
+  components: {},
 };
 </script>
 
