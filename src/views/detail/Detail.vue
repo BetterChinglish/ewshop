@@ -5,7 +5,7 @@
         
       </template> -->
       <template v-slot:default>
-          商品详情
+          商品详情 {{id}}
       </template>
 
       <!-- <template v-slot:right>
@@ -18,11 +18,25 @@
 
 <script>
 import NavBar from '@/components/common/navbar/NavBar.vue';
+import {useRoute} from 'vue-router';
+import { ref } from 'vue';
 
 export default {
     name: 'Detail',
     components: {
         NavBar
+    },
+    setup() {
+        const route = useRoute();
+
+        let id = ref(0);
+
+        id.value = route.query.id;
+
+
+        return {
+            id
+        }
     }
     
 }
