@@ -11,9 +11,12 @@
     </div>
 
 
-    <recommend-view :recommends="recommends">
+    <recommend-view :recommends="recommends"></recommend-view>
 
-    </recommend-view>
+    <tab-control :titles="titles" @tabControlClicked="changePage">
+
+    </tab-control>
+    {{pageId}} <br>
 
   </div>
 </template>
@@ -21,8 +24,9 @@
 <script>
 import NavBar from "@/components/common/navbar/NavBar.vue";
 import RecommendView from "views/home/childComps/RecommendView.vue";
-import { getHomeAllData } from "network/home";
+import TabControl from "components/content/tabControl/TabControl.vue";
 
+import { getHomeAllData } from "network/home";
 import { onMounted, ref, reactive } from "vue";
 
 export default {
@@ -30,12 +34,14 @@ export default {
   components: {
     NavBar,
     RecommendView,
+    TabControl,
 
   },
   
   setup() {
 
     const recommends = ref([]);
+    let titles = ['畅销', '新书', '精选'];
 
     onMounted(() => {
       getHomeAllData()
@@ -46,8 +52,17 @@ export default {
         })
     });
 
+    let pageId = ref(0);
+
+    const changePage = (index) => {
+      pageId.value = index;
+    }
+
     return {
       recommends,
+      titles,
+      pageId,
+      changePage,
     }
 
   },
