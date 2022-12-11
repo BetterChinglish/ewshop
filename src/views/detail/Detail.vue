@@ -1,11 +1,11 @@
 <template>
-  <div>
+<div>
     <nav-bar>
       <!-- <template v-slot:left>
         
       </template> -->
       <template v-slot:default>
-          图书商城
+          商品详情
       </template>
 
       <!-- <template v-slot:right>
@@ -13,19 +13,18 @@
       </template> -->
 
     </nav-bar>
-  </div>
+</div>
 </template>
 
 <script>
 import NavBar from '@/components/common/navbar/NavBar.vue';
 
 export default {
-  name: 'HomeView',
-  components: {
-    NavBar,
-  }
-  
-  
+    name: 'Detail',
+    components: {
+        NavBar
+    }
+    
 }
 </script>
 
