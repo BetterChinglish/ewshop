@@ -16,8 +16,7 @@
     <tab-control :titles="titles" @tabControlClicked="changePage">
 
     </tab-control>
-    {{pageId}} <br>
-
+    <goods-list :goods="showGoods"></goods-list>
   </div>
 </template>
 
@@ -25,9 +24,10 @@
 import NavBar from "@/components/common/navbar/NavBar.vue";
 import RecommendView from "views/home/childComps/RecommendView.vue";
 import TabControl from "components/content/tabControl/TabControl.vue";
+import GoodsList from 'components/content/goods/GoodsList.vue';
 
-import { getHomeAllData } from "network/home";
-import { onMounted, ref, reactive } from "vue";
+import { getHomeAllData, getHomeGoods } from "network/home";
+import { onMounted, ref, reactive, computed } from "vue";
 
 export default {
   name: "HomeView",
@@ -35,7 +35,7 @@ export default {
     NavBar,
     RecommendView,
     TabControl,
-
+    GoodsList,
   },
   
   setup() {
@@ -43,26 +43,71 @@ export default {
     const recommends = ref([]);
     let titles = ['畅销', '新书', '精选'];
 
+    let goods = reactive({
+      sales: {
+        page: 0,
+        list:[]
+      },
+      new: {
+        page: 0,
+        list:[]
+      },
+      recommend: {
+        page: 0,
+        list:[]
+      },
+    })
+
+    // 当前传入主页面的是畅销还是新书还是精选
+    let currentType = ref('sales');
+    // let showGoods = computed(()=>{
+    //   return goods[currentType.value].list;
+    // });
+
+    let showGoods = ref([]);
+
     onMounted(() => {
       getHomeAllData()
         .then((result) => {
           recommends.value = result.goods.data;
-          console.log(recommends);
+          // console.log(recommends);
 
-        })
+        });
+      
+      getHomeGoods('sales').then(res=>{
+        goods.sales.list = res.goods.data;
+        showGoods.value = res.goods.data;
+        
+      });
+
+      getHomeGoods('recommend').then(res=>{
+        goods.recommend.list = res.goods.data;
+        
+      });
+      
+      getHomeGoods('new').then(res=>{
+        goods.new.list = res.goods.data;
+        console.log(res.goods.data);
+        
+      });
+
+
     });
 
-    let pageId = ref(0);
 
     const changePage = (index) => {
-      pageId.value = index;
+      let types = ['sales', 'new', 'recommend'];
+      showGoods.value = goods[types[index]].list;
+
+      // console.log(showGoods.value);
+
     }
 
     return {
       recommends,
       titles,
-      pageId,
       changePage,
+      showGoods,
     }
 
   },

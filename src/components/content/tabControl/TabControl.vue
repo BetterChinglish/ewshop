@@ -55,6 +55,7 @@ export default {
     font-size: 14px;
     background-color: #fff;
     width: 100%;
+    z-index: 10;
 
     position: sticky;
     top: 45px;
