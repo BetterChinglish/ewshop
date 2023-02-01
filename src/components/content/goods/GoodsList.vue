@@ -1,7 +1,7 @@
 <template>
 <div class="goods">
     <!-- product是当前商品，传入子组件交由子组件处理 -->
-    <GoodsListItem v-for="item in goods" :key="item.id" :product="item"></GoodsListItem>
+    <GoodsListItem v-for="item in goods" :key="item" :product="item"></GoodsListItem>
      
 </div>
 

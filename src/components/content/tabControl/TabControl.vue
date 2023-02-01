@@ -3,18 +3,20 @@
         <div  
             v-for="(item, index) in titles" 
             :key="index" class="tab-control-item"
-            @click="select(index)"
+            @click="select(index); toEmit(index)"
             :class="{selected: index == currentIndex}">
 
             <span>{{item}}</span>
         </div>
+
+        <button @click="changeA"></button>
 
 
     </div>
 </template>
 
 <script>
-import {ref} from 'vue';
+import {computed, ref, watch, watchEffect} from 'vue';
 
 export default {
     name: 'TabControl',
@@ -24,21 +26,38 @@ export default {
             default() {
                 return [];
             }
+        },
+        currentType: {
+            type: String,
+            default() {
+
+            }
         }
     },
+
     setup(props, {emit}) {
         // console.log(props.titles);
         let currentIndex = ref(0);
-        const select = (index) => {
+        // const select = (index) => {
+        //     currentIndex.value = index;
+
+        // };
+
+        function select(index) {
             currentIndex.value = index;
+
+        }
+
+        
+
+        const toEmit = (index) => {
             emit('tabControlClicked', index);
-
-        };
-
+        }
 
         return {
             currentIndex,
             select,
+            toEmit,
         }
     },
 
