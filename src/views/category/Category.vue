@@ -68,7 +68,7 @@ export default {
             getCategory().then(res=>{
                 // 由于数据库被其他人添加了别的数据, 这里只使用前5个
                 categories.value = res.categories.slice(0,5);
-                console.log(categories);
+                // console.log(categories);
             })
         })
         
