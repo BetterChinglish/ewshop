@@ -2,7 +2,7 @@
 <div class="goods-item">
 
     <!-- 书的缩略图 -->
-    <img :src="product.cover_url" alt="">
+    <img v-lazy="product.cover_url" alt="">
 
     <!-- 书的信息 -->
     <div class="goods-info">

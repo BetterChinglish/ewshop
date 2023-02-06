@@ -12,7 +12,13 @@
     </router-link> 
 
     <router-link class="tab-bar-item" to="/shopcart">
-      <div class="icon"><i class="iconfont icon-gouwugouwuchedinggou"></i></div>
+      <div class="icon">
+        <van-badge :content="0" max="99">
+          <i class="iconfont icon-gouwugouwuchedinggou"></i>
+        </van-badge>
+      </div>
+
+
       <div>购物车</div>
     </router-link>
 

@@ -23,9 +23,13 @@
         
         <!-- 选定该元素, 控制书类选择栏显示 -->
         <div ref="banref">
-          <div class="banners">
+          <!-- <div class="banners">
             <img src="~assets/images/1.png" alt="" />
-          </div>
+          </div> -->
+
+          <home-swiper :banners='banners'></home-swiper>
+          
+
 
           <recommend-view :recommends="recommends"></recommend-view>
 
@@ -45,15 +49,20 @@
 </template>
 
 <script>
+// 自己的组件
 import NavBar from "@/components/common/navbar/NavBar.vue";
 import RecommendView from "views/home/childComps/RecommendView.vue";
 import TabControl from "components/content/tabControl/TabControl.vue";
 import GoodsList from "components/content/goods/GoodsList.vue";
 import BackTop from 'components/common/backtop/BackTop.vue';
+import HomeSwiper from 'views/home/childComps/HomeSwiper.vue';
 
+// 函数方法等依赖
 import { getHomeAllData, getHomeGoods } from "network/home";
 import { onMounted, ref, reactive, computed, watchEffect, nextTick } from "vue";
 import BScroll from "better-scroll";
+
+// 导入的组件
 
 export default {
   name: "HomeView",
@@ -64,6 +73,10 @@ export default {
     GoodsList,
     BackTop,
     BackTop,
+    HomeSwiper,
+    // vant组件
+
+
   },
 
   setup() {
@@ -107,11 +120,19 @@ export default {
 
     let bscroll = reactive({test:'hi'});
 
+    // 轮播图图片
+    let banners = ref([]);
+
     onMounted(() => {
       // console.log(banref.value);
 
       getHomeAllData().then((result) => {
+
+        // 获取推荐图书
         recommends.value = result.goods.data;
+
+        // 获取banners的轮播图
+        banners.value = result.slides;
       });
       getHomeGoods("sales").then((res) => {
         goods.sales.list = res.goods.data;
@@ -184,7 +205,9 @@ export default {
       banref,
       BTop,
       copyTabControl,
-      trueTabControl
+      trueTabControl,
+
+      banners,
     };
   },
 };

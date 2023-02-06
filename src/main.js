@@ -3,4 +3,14 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
-createApp(App).use(store).use(router).mount('#app')
+import { Lazyload } from 'vant';
+
+createApp(App)
+    .use(Lazyload, {
+        loading: require('assets/images/default.png'),
+        lazyComponent: true,
+        
+    })
+    .use(store)
+    .use(router)
+    .mount('#app')

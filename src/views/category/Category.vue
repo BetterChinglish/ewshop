@@ -12,7 +12,12 @@
 
       </template> -->
 
+
+
     </nav-bar>
+    <van-button type="primary" />
+    
+
 </div>
 </template>
 
