@@ -8,13 +8,8 @@
 
             <span>{{item}}</span>
         </div>
-
-        <button @click="changeA"></button>
-
-
     </div>
 </template>
-
 <script>
 import {computed, ref, watch, watchEffect} from 'vue';
 
