@@ -165,7 +165,8 @@ export default {
 
             getCategoryGoods(currentOrder.value, currentCid.value).then(res=>{
                 goods[currentOrder.value].list = res.goods.data;
-                bscroll.scrollTo(0,0);
+                goods[currentOrder.value].page = 1;
+                bscroll.scrollTo(0,0,200);
                 nextTick(()=>{
                     bscroll.refresh();
                 })
@@ -195,7 +196,7 @@ export default {
             getCategoryGoods('comments_count', currentCid.value).then(res=>{
                 goods.comments_count.list = res.goods.data;
                 goods.comments_count.page = 1;
-                bscroll.scrollTo(0,0);
+                bscroll.scrollTo(0,0,200);
                 nextTick(()=>{
                     bscroll.refresh();
 
