@@ -141,12 +141,15 @@ export default {
 </script>
 
 <style lang="scss">
+
 .aboutBook {
     .van-card {
         font-size: 16px;
     }
 }
-
+.van-image {
+    height: 375px;
+}
 .bottomTab {
     position: fixed;
     bottom: 5px;
