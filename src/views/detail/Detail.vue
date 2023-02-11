@@ -148,7 +148,7 @@ export default {
                 // console.log(res);
                 book.detail = res.goods;
                 book.like_goods = res.like_goods;
-                console.log(res);
+                // console.log(res);
                 images.push(book.detail.cover_url);
             });
 
