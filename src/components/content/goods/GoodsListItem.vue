@@ -41,12 +41,33 @@ export default {
     setup(props) {
         const router = useRouter();
         const route = useRoute();
+
+        // 此watch用于更新该页面
+        // 由于同路由不同参数时，页面vue会选择复用刚才的模板，使其无法更新
+        // 同时也不会调用生命周期
+        // 监听route，也就是当前路由，如果发生改变，则跳转0，相当于刷新页面
+        // 也就是说此时只需要刷新页面就可以显示跳转内容
+        // 就算没有下面这行代码，也可以手动刷新网页从而显示跳转的内容
         watch(route,
             (to, from) => {
                 router.go(0);
             }
 
         )
+        // 另外，还有别的方法也可以达到此目的
+        // 比如在<router-link>中设置v-if=isRouteAlive,默认isRouteAlive为真
+        // 封装函数:
+        // reload() {
+        //     this.isRouterAlive = false;
+        //     this.$nextTick(() => (this.isRouterAlive = true));
+        // }
+        // 将其传入跳转页面, 在router.push()后调用该方法即可
+        // 原理类似, 设置isRouterAlive为false使其dom消除
+        // 再在nextTick回调时也就是页面发生改变后使其为真
+        // 此时该router-link的内容就会重新加载
+        // 也起到了刷新的目的
+
+        
 
         return {
             itemClick: ()=>{
