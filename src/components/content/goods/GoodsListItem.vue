@@ -67,6 +67,9 @@ export default {
         // 此时该router-link的内容就会重新加载
         // 也起到了刷新的目的
 
+        // 当然还有一种方法, 就是router.push到一个空白页面再push回来
+        // 但这会导致中途有空白页面的产生, 不推荐使用
+
         
 
         return {
