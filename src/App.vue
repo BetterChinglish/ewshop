@@ -1,5 +1,5 @@
 <template>
-  <router-view/>
+  <router-view v-if="isRouterAlive"/>
   <nav v-show="isDetail">
     <router-link class="tab-bar-item" to="/">
       <div class="icon"><i class="iconfont icon-shouye1"></i></div>
@@ -27,17 +27,18 @@
       <div>我的</div>
     </router-link>
   </nav>
+
 </template>
 
 <script>
-import { ref, watchEffect } from '@vue/runtime-core';
+import { nextTick, provide, ref, watchEffect } from '@vue/runtime-core';
 import {  useRouter } from 'vue-router';
 export default {
   name: 'App',
   setup() {
     let router = useRouter();
     let isDetail = ref(false);
-    console.log(router.currentRoute.value.fullPath);
+    
     watchEffect(()=>{
       if(router.currentRoute.value.fullPath.slice(0,7) == '/detail') {
         isDetail.value = false;
@@ -47,8 +48,20 @@ export default {
       }
     })
 
+    let isRouterAlive = ref(true);
+    let reload = ()=>{
+      isRouterAlive.value = false;
+      nextTick(function(){
+        isRouterAlive.value = true;
+      })
+    }
+
+    provide('reload',reload);
+
     return {
-      isDetail
+      isDetail,
+      isRouterAlive,
+      reload
     }
   }
 }

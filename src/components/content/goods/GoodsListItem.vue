@@ -27,7 +27,7 @@
 
 <script>
 import {useRoute, useRouter} from 'vue-router';
-import {watch} from 'vue';
+import {inject, watch} from 'vue';
 export default {
     name: 'GoodsListItem',
     props: {
@@ -48,12 +48,12 @@ export default {
         // 监听route，也就是当前路由，如果发生改变，则跳转0，相当于刷新页面
         // 也就是说此时只需要刷新页面就可以显示跳转内容
         // 就算没有下面这行代码，也可以手动刷新网页从而显示跳转的内容
-        watch(route,
-            (to, from) => {
-                router.go(0);
-            }
+        // watch(route,
+        //     (to, from) => {
+        //         router.go(0);
+        //     }
 
-        )
+        // )
         // 另外，还有别的方法也可以达到此目的
         // 比如在<router-link>中设置v-if=isRouteAlive,默认isRouteAlive为真
         // 封装函数:
@@ -70,17 +70,17 @@ export default {
         // 当然还有一种方法, 就是router.push到一个空白页面再push回来
         // 但这会导致中途有空白页面的产生, 不推荐使用
 
-        
+        let itemClick = ()=>{
+            router.push({
+                path:'detail',
+                query: {
+                    id: props.product.id
+                }
+            });
+        }
 
         return {
-            itemClick: ()=>{
-                router.push({
-                    path:'detail',
-                    query: {
-                        id: props.product.id
-                    }
-                })
-            }
+            itemClick
         }
     }
     

@@ -63,7 +63,6 @@ const router = createRouter({
 })
 router.beforeEach((to, from, next) => {
   document.title = to.meta.title;
-
   // 没有注册可以在此拦截进行注册
   next();
 })

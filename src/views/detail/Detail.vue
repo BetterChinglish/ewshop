@@ -1,6 +1,6 @@
 <template>
 <div>
-    <nav-bar>
+    <nav-bar @click="showSome">
         <!-- <template v-slot:left>
             
         </template> -->
@@ -62,7 +62,7 @@
             </van-tab>
             <van-tab title="相关图书">
                 <goods-list :goods="like_goods"></goods-list>
-                
+
             </van-tab>
         </van-tabs>
 
@@ -85,8 +85,8 @@
 
 <script>
 import NavBar from '@/components/common/navbar/NavBar.vue';
-import {useRoute} from 'vue-router';
-import { ref, onMounted, reactive, toRefs } from 'vue';
+import {useRoute, useRouter} from 'vue-router';
+import { ref, onMounted, reactive, toRefs, nextTick, provide, watch,inject } from 'vue';
 import {getDetail} from 'network/detail.js';
 import GoodsList from "components/content/goods/GoodsList.vue";
 export default {
@@ -96,6 +96,7 @@ export default {
         GoodsList
     },
     setup() {
+        const router = useRouter();
 
         let active = ref(0);
         // 用于接收当前路由参数
@@ -114,6 +115,14 @@ export default {
             like_goods: [],
 
         });
+        let reload = inject('reload');
+
+        watch(
+            route,
+            (n,o)=>{
+                reload();
+            }
+        )
 
         const show = ref(false);
         const index = ref(0);
@@ -143,7 +152,6 @@ export default {
                 images.push(book.detail.cover_url);
             });
 
-
         })
 
         // 返回需要的数据
@@ -158,6 +166,10 @@ export default {
             onChange,
             toShow,
             onClose,
+            showSome:()=>{
+                      
+                       
+            }
         }
     }
     

@@ -20,7 +20,8 @@
 </template>
 
 <script>
-import {useRouter} from 'vue-router';
+import { inject } from '@vue/runtime-core';
+import {useRoute, useRouter} from 'vue-router';
 
 export default {
     name: 'NavBar',
@@ -28,6 +29,9 @@ export default {
         const router = useRouter();
         const goBack = () => {
             router.go(-1);
+            // console.log(router.currentRoute.value.fullPath);
+            // console.log(reload);
+
         };
 
         return {
