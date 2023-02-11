@@ -26,7 +26,8 @@
 </template>
 
 <script>
-import {useRouter} from 'vue-router';
+import {useRoute, useRouter} from 'vue-router';
+import {watch} from 'vue';
 export default {
     name: 'GoodsListItem',
     props: {
@@ -39,7 +40,13 @@ export default {
     },
     setup(props) {
         const router = useRouter();
+        const route = useRoute();
+        watch(route,
+            (to, from) => {
+                router.go(0);
+            }
 
+        )
 
         return {
             itemClick: ()=>{
@@ -49,7 +56,6 @@ export default {
                         id: props.product.id
                     }
                 })
-                routerRefresh();
             }
         }
     }
