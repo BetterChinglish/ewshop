@@ -51,6 +51,26 @@
             </template> -->
         </van-card>
 
+        <van-tabs v-model:active="active">
+            <van-tab title="概述">
+                <div class="detailContent" v-html="detail.details"></div>
+            </van-tab>
+            <van-tab title="评论">
+                <div class="detailComments">
+                    数据库不完善
+                </div>
+            </van-tab>
+            <van-tab title="相关图书">
+                <goods-list :goods="like_goods"></goods-list>
+                
+            </van-tab>
+        </van-tabs>
+
+        <div class="detailWhiteSpace"></div>
+
+        
+
+
         <div class="bottomTab">
             <van-button class="addToCart" color="orange" >加入购物车</van-button>
             <van-button class="buyRightNow" color="red">立即购买</van-button>
@@ -68,12 +88,16 @@ import NavBar from '@/components/common/navbar/NavBar.vue';
 import {useRoute} from 'vue-router';
 import { ref, onMounted, reactive, toRefs } from 'vue';
 import {getDetail} from 'network/detail.js';
+import GoodsList from "components/content/goods/GoodsList.vue";
 export default {
     name: 'Detail',
     components: {
-        NavBar
+        NavBar,
+        GoodsList
     },
     setup() {
+
+        let active = ref(0);
         // 用于接收当前路由参数
         const route = useRoute();
 
@@ -115,7 +139,7 @@ export default {
                 // console.log(res);
                 book.detail = res.goods;
                 book.like_goods = res.like_goods;
-                // console.log(book);
+                console.log(res);
                 images.push(book.detail.cover_url);
             });
 
@@ -129,7 +153,7 @@ export default {
             show,
             index,
             images,
-
+            active,
 
             onChange,
             toShow,
@@ -150,6 +174,20 @@ export default {
 .van-image {
     height: 375px;
 }
+
+.detailContent {
+    // width: 100vh;
+    padding: 10px;
+    img {
+        width: 100%;
+        height: auto;
+    }
+}
+.detailWhiteSpace {
+    max-width: 100%;
+    height: 60px;
+}
+
 .bottomTab {
     position: fixed;
     bottom: 5px;

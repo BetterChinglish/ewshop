@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { ref, watch, watchEffect } from '@vue/runtime-core';
+import { ref, watchEffect } from '@vue/runtime-core';
 import {  useRouter } from 'vue-router';
 export default {
   name: 'App',

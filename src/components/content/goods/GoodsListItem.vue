@@ -49,6 +49,7 @@ export default {
                         id: props.product.id
                     }
                 })
+                routerRefresh();
             }
         }
     }
