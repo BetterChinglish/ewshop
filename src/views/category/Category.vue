@@ -44,6 +44,7 @@
         <div class="goodslist">
             <div class="content">
                 <van-card
+                    @click="itemClick(item.id)"
                     v-for="item in showGoods" :key="item.id"
                     :price="item.price+'.00'"
                     :desc="item.updated_at"
@@ -71,6 +72,7 @@ import {ref, reactive, onMounted, computed, watchEffect, nextTick} from 'vue';
 import {getCategory, getCategoryGoods} from 'network/category';
 import BScroll from "better-scroll";
 import BackTop from 'components/common/backtop/BackTop.vue';
+import {useRouter} from 'vue-router';
 
 export default {
     name: 'Category',
@@ -79,6 +81,8 @@ export default {
         BackTop,
     },
     setup() {
+        const router = useRouter();
+
         // 左侧边栏当前选择第几个
         let active = ref(0);
         // 侧边栏一级选项
@@ -227,6 +231,9 @@ export default {
             tabClick,
             ChangeGoodsId,
             BTop,
+            itemClick: (id)=> {
+                router.push({path:'/detail', query:{id}});
+            }
         }
     },
     

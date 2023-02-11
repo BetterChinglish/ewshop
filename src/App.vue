@@ -1,6 +1,6 @@
 <template>
   <router-view/>
-  <nav>
+  <nav v-show="isDetail">
     <router-link class="tab-bar-item" to="/">
       <div class="icon"><i class="iconfont icon-shouye1"></i></div>
       <div>首页</div>
@@ -28,6 +28,31 @@
     </router-link>
   </nav>
 </template>
+
+<script>
+import { ref, watch, watchEffect } from '@vue/runtime-core';
+import {  useRouter } from 'vue-router';
+export default {
+  name: 'App',
+  setup() {
+    let router = useRouter();
+    let isDetail = ref(false);
+    console.log(router.currentRoute.value.fullPath);
+    watchEffect(()=>{
+      if(router.currentRoute.value.fullPath.slice(0,7) == '/detail') {
+        isDetail.value = false;
+      }
+      else {
+        isDetail.value = true;
+      }
+    })
+
+    return {
+      isDetail
+    }
+  }
+}
+</script>
 
 <style lang="scss">
 @import 'assets/css/base.css';

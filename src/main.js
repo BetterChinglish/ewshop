@@ -5,6 +5,7 @@ import store from './store'
 
 import { Lazyload } from 'vant';
 
+
 createApp(App)
     .use(Lazyload, {
         loading: require('assets/images/default.png'),

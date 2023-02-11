@@ -1,5 +1,5 @@
 <template>
-<div class="goods-item">
+<div class="goods-item" @click="itemClick">
 
     <!-- 书的缩略图 -->
     <img v-lazy="product.cover_url" alt="">
@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import {useRouter} from 'vue-router';
 export default {
     name: 'GoodsListItem',
     props: {
@@ -33,6 +34,21 @@ export default {
             type: Object,
             default() {
                 return [];
+            }
+        }
+    },
+    setup(props) {
+        const router = useRouter();
+
+
+        return {
+            itemClick: ()=>{
+                router.push({
+                    path:'detail',
+                    query: {
+                        id: props.product.id
+                    }
+                })
             }
         }
     }

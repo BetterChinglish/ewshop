@@ -1,6 +1,6 @@
 <template>
 <div>
-    <van-swipe :autoplay="3000" lazy-render>
+    <van-swipe :autoplay="5000" :duration="1000" lazy-render>
         <van-swipe-item v-for="(item, index) in banners" :key="index">
             <img v-lazy="item.img_url" />
         </van-swipe-item>
@@ -23,9 +23,10 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-    img {
+<style lang="scss">
+    .van-swipe-item img {
         width: 100%;
-        height: auto;
+        height: 160px;
+        
     }
 </style>

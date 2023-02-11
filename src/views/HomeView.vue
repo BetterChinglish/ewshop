@@ -27,7 +27,10 @@
             <img src="~assets/images/1.png" alt="" />
           </div> -->
 
-          <home-swiper :banners='banners'></home-swiper>
+          <home-swiper 
+            :banners='banners'>
+          
+          </home-swiper>
           
 
 
