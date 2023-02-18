@@ -1,9 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from 'views/HomeView.vue'
-const Category = () => import(/* webpackChunkName: "category" */ 'views/category/Category.vue')
-const Detail = () => import(/* webpackChunkName: "detail" */ '../views/detail/Detail.vue')
-const Profile = () => import(/* webpackChunkName: "profile" */ '../views/profile/Profile.vue')
-const Shopcart = () => import(/* webpackChunkName: "shopcart" */ '../views/shopcart/Shopcart.vue')
+const Category = () => import(/* webpackChunkName: "category" */ 'views/category/Category.vue');
+const Detail = () => import(/* webpackChunkName: "detail" */ '../views/detail/Detail.vue');
+const Profile = () => import(/* webpackChunkName: "profile" */ '../views/profile/Profile.vue');
+const Shopcart = () => import(/* webpackChunkName: "shopcart" */ '../views/shopcart/Shopcart.vue');
+const Register = () => import(/* webpackChunkName: "Register" */ '../views/profile/Register.vue');
 
 const routes = [
   {
@@ -52,6 +53,15 @@ const routes = [
     component: Profile,
     meta: {
       title: '个人中心'
+    }
+  },
+
+  {
+    path: '/register',
+    name: 'Register',
+    component: Register,
+    meta: {
+      title: '用户注册'
     }
   },
 

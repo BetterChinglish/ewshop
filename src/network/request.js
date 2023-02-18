@@ -23,13 +23,14 @@ export function request(config) {
 
     // 响应拦截
     instance.interceptors.response.use(res => { 
-
+           
         // 直接放行
         return res.data ? res.data : res;
 
     }, err => { 
         // 响应有错误在此处理, 显示错误信息
-
+        return err.response;
+        
         // 授权才可以访问的接口, 统一跳转登录以授权
 
 

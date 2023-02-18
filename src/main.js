@@ -3,7 +3,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
-import { Lazyload } from 'vant';
+import { Lazyload, Notify, Toast   } from 'vant';
 
 
 createApp(App)
@@ -12,6 +12,8 @@ createApp(App)
         lazyComponent: true,
         
     })
+    .use(Notify)
+    .use(Toast)
     .use(store)
     .use(router)
     .mount('#app')
