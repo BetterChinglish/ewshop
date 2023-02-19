@@ -18,7 +18,7 @@
             height="6rem"
             fit="contain"
             position="center"
-            src="http://shop2.eduwork.cn/uploads/2022-0527-629086e025645.png"
+            src="~assets/images/ewshopLogo.png"
         />
     </div>
 
