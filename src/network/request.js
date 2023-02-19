@@ -35,8 +35,10 @@ export function request(config) {
         // 授权才可以访问的接口, 统一跳转登录以授权
         if (err.response.status == '401') {
             if (router.currentRoute.value.fullPath == '/login') {
-                
+                // 如果当前处于登录页面则交给登录页面代码做错误处理
+
             }
+            // 否则提示用户去登录
             else {
                 showToast({
                     message: '请先登录!',
