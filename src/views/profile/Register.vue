@@ -85,6 +85,9 @@
             </van-cell-group>
 
             <div style="margin: 16px;">
+                <div class="linkToLogin" @click="$router.push({path: '/login'})">
+                    已有账号? 立即登录!
+                </div>
                 <van-button round block type="primary" color="#44b883" native-type="submit">
                     提交
                 </van-button>
@@ -240,5 +243,12 @@ export default {
 
 .sucessRegisterToast {
     width: 50%;
+}
+
+.linkToLogin {
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: aquamarine;
+    text-align: right;
 }
 </style>
