@@ -162,9 +162,6 @@ export default {
                         router.go(-1);
                     }, 500);
                 }
-                
-                console.log(res);
-
             })
            
         };
