@@ -98,7 +98,7 @@ export default {
         const router = useRouter();
         const store = useStore();
 
-        const ewshopLogo = require('~assets/images/ewshopLogo.png');
+        const ewshopLogo = require('assets/images/ewshopLogo.png');
 
         // 获取表单
         let myLoginForm = ref(null);
@@ -177,7 +177,7 @@ export default {
             myLoginForm,
             testEmailPattern,
             ewshopLogo,
-            
+
         };    
     }
 }
