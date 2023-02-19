@@ -10,6 +10,8 @@
       </template> -->
     </nav-bar>
 
+
+    <!-- 退出登录按钮 -->
     <div style="margin-top: 50px">
         <van-button round block color='#44BA80' @click="toLogout">logout</van-button>
     </div>
@@ -30,17 +32,25 @@ export default {
 
     setup() {
         const router = useRouter();
+
+        // 退出登录按钮点击处理程序
         const toLogout = () => {
             logout().then(res => {
                 // console.log(res);
+
+                // 如果退出成功返回204
                 if(res.status == '204') {
+
+                    // 提示用户退出成功
                     showToast({
                         message: '退出成功',
                         type: 'success',
                     });
 
+                    // 清除设置的token
                     window.localStorage.removeItem('ewshopToken');
 
+                    // 跳转到登录页面
                     setTimeout(() => {
                         router.push({
                             path: '/login',

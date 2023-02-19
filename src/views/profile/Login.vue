@@ -146,9 +146,11 @@ export default {
                         type: 'success',
                     });
 
+                    // 清除输入框缓存下的内容
                     userInputInfo.email = '';
                     userInputInfo.password = '';
 
+                    // 返回, 从哪点进来注册就返回到哪个页面去
                     setTimeout(() => {
                         router.go(-1);
                     }, 500);

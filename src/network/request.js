@@ -38,7 +38,7 @@ export function request(config) {
                 // 如果当前处于登录页面则交给登录页面代码做错误处理
 
             }
-            // 否则提示用户去登录
+            // 否则提示用户去登录, 并跳转
             else {
                 showToast({
                     message: '请先登录!',
