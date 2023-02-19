@@ -18,7 +18,7 @@
             height="6rem"
             fit="contain"
             position="center"
-            src="~assets/images/ewshopLogo.png"
+            :src="ewshopLogo"
         />
     </div>
 
@@ -126,7 +126,10 @@ export default {
             password: '',
             password_confirmation: '',
             email: '',
-        })
+        });
+
+        // 存储logo
+        const ewshopLogo = require('~assets/images/ewshopLogo.png');
 
         // 邮箱校验正则
         let testEmailPattern = /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/;
@@ -230,7 +233,8 @@ export default {
             onSubmit,
             isSamePassword,
             myRegisterForm,
-            testPasswordConfirmation
+            testPasswordConfirmation,
+            ewshopLogo,
         };    
     }
 }

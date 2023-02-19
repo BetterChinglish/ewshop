@@ -18,7 +18,7 @@
             height="6rem"
             fit="contain"
             position="center"
-            src="~assets/images/ewshopLogo.png"
+            :src="ewshopLogo"
         />
     </div>
 
@@ -97,6 +97,9 @@ export default {
     setup() {
         const router = useRouter();
         const store = useStore();
+
+        const ewshopLogo = require('~assets/images/ewshopLogo.png');
+
         // 获取表单
         let myLoginForm = ref(null);
         // 存储用户输入的信息
@@ -173,6 +176,8 @@ export default {
             onSubmit,
             myLoginForm,
             testEmailPattern,
+            ewshopLogo,
+            
         };    
     }
 }
