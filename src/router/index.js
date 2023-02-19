@@ -5,6 +5,7 @@ const Detail = () => import(/* webpackChunkName: "detail" */ '../views/detail/De
 const Profile = () => import(/* webpackChunkName: "profile" */ '../views/profile/Profile.vue');
 const Shopcart = () => import(/* webpackChunkName: "shopcart" */ '../views/shopcart/Shopcart.vue');
 const Register = () => import(/* webpackChunkName: "Register" */ '../views/profile/Register.vue');
+const Login = () => import(/* webpackChunkName: "Login" */ '../views/profile/Login.vue');
 
 const routes = [
   {
@@ -62,6 +63,15 @@ const routes = [
     component: Register,
     meta: {
       title: '用户注册'
+    }
+  },
+
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login,
+    meta: {
+      title: '用户登录'
     }
   },
 
