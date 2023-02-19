@@ -23,6 +23,7 @@ import NavBar from '@/components/common/navbar/NavBar.vue';
 import { logout } from 'network/user.js';
 import { showToast } from 'vant';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 export default {
     name: 'Profile',
@@ -32,6 +33,7 @@ export default {
 
     setup() {
         const router = useRouter();
+        const store = useStore();
 
         // 退出登录按钮点击处理程序
         const toLogout = () => {
@@ -49,6 +51,9 @@ export default {
 
                     // 清除设置的token
                     window.localStorage.removeItem('ewshopToken');
+                    if(!window.localStorage.getItem('ewshopToken')) {
+                        store.commit('setIsLogin', false);
+                    }
 
                     // 跳转到登录页面
                     setTimeout(() => {

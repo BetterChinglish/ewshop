@@ -77,11 +77,12 @@
 // 本地组件
 import NavBar from '@/components/common/navbar/NavBar.vue';
 
-// 依赖组件
+// 依赖项
 import { reactive, ref, toRefs } from 'vue';
 import { closeToast, showNotify, showToast } from 'vant';
 import { login } from 'network/user.js';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 // 样式
 import 'vant/es/toast/style';
@@ -95,6 +96,7 @@ export default {
 
     setup() {
         const router = useRouter();
+        const store = useStore();
         // 获取表单
         let myLoginForm = ref(null);
         // 存储用户输入的信息
@@ -138,7 +140,9 @@ export default {
                     // 或者临时保存在vuex
                     window.localStorage.setItem('ewshopToken', res.access_token);
                     // console.log('存储为ewshopToken: ' + window.localStorage.getItem('ewshopToken'));
-
+                    if(window.localStorage.getItem('ewshopToken')) {
+                        store.commit('setIsLogin', true);
+                    }
                     let toast = showToast({
                         message: `登录成功`,
                         duration: 1000,
