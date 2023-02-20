@@ -1,6 +1,6 @@
 <template>
 <div>
-    <nav-bar @click="showSome">
+    <nav-bar>
         <!-- <template v-slot:left>
             
         </template> -->
@@ -72,8 +72,8 @@
 
 
         <div class="bottomTab">
-            <van-button class="addToCart" color="orange" >加入购物车</van-button>
-            <van-button class="buyRightNow" color="red">立即购买</van-button>
+            <van-button class="addToCart" color="orange" @click="addToCart">加入购物车</van-button>
+            <van-button class="buyRightNow" color="red" @click="goToCart">立即购买</van-button>
         </div>
 
     </div>
@@ -97,10 +97,12 @@ export default {
     },
     setup() {
         const router = useRouter();
-
-        let active = ref(0);
         // 用于接收当前路由参数
         const route = useRoute();
+
+        // 控制tab选项卡
+        let active = ref(0);
+
 
         // 接收当前商品id
         let id = ref(0);
@@ -115,8 +117,11 @@ export default {
             like_goods: [],
 
         });
+
+        // 获取更新dom函数, 解决跳转当前路由但是组件复用导致的无法正常展示的bug
         let reload = inject('reload');
 
+        // 监听route, 发生改变则调取reload()函数以刷新dom, 解决跳转当前路由但是组件复用导致的无法正常展示的bug
         watch(
             route,
             (n,o)=>{
@@ -124,20 +129,28 @@ export default {
             }
         )
 
+        // 点击图片时预览, 默认不显示, 点击图片时显示
         const show = ref(false);
+        // 显示第几张预览的图片, 并做提示第几张图
         const index = ref(0);
+        // 保存图片地址
         const images = reactive([]);
+        // 预览图片时发生图片改变时的回调
         const onChange = (newIndex) => {
             index.value = newIndex;
         };
 
+        // 点击图片时修改show为true, 使预览图片层显示
         const toShow = ()=>{
             show.value = true;
         }
 
+        // 关闭预览时设置为false, 关闭预览图片层
         const onClose = ()=>{
             show.value = false;
         }
+
+
         onMounted(() => {
 
             // 通过路由传参，获取要显示的商品的id
@@ -154,6 +167,16 @@ export default {
 
         })
 
+        // 点击添加到购物车按钮触发的函数
+        let addToCart = () => {
+
+        }
+
+        // 点击立即购买按钮时触发的函数
+        let goToCart = () => {
+
+        }
+
         // 返回需要的数据
         return {
             id,
@@ -166,10 +189,8 @@ export default {
             onChange,
             toShow,
             onClose,
-            showSome:()=>{
-                      
-                       
-            }
+            addToCart,
+            goToCart,  
         }
     }
     
