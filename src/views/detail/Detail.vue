@@ -92,6 +92,7 @@ import {getDetail} from 'network/detail.js';
 import GoodsList from "components/content/goods/GoodsList.vue";
 import { addCart } from 'network/cart.js';
 import { showNotify, showToast } from 'vant';
+import { useStore } from 'vuex';
 
 export default {
     name: 'Detail',
@@ -100,6 +101,7 @@ export default {
         GoodsList
     },
     setup() {
+        const store = useStore();
         const router = useRouter();
         // 用于接收当前路由参数
         const route = useRoute();
@@ -180,18 +182,25 @@ export default {
 
 
             addCart({goods_id: id.value, num: 1}).then(res => {
-                if(String.prototype.slice.call(res.status, 0, 1) == '2') {
-                    showAddToCart.value = false;
-
+                showAddToCart.value = false;
+                if(res.status== '201') {
                     showToast({
                         message: '添加成功! 在购物车里等你~',
                         type: 'success',
                         duration: 2000,
                         className: 'addToCartRight'
-                    })
+                    });
+                    store.dispatch('updateCartCount');
+                }
+                else if(res.status=='204') {
+                    showToast({
+                        message: '已在购物车, 快去结算吧~',
+                        type: 'success',
+                        duration: 2000,
+                        className: 'addToCartRight'
+                    });
                 }
                 else {
-                    showAddToCart.value = false;
                     showNotify({
                         message: 'something wrong',
                         position: 'bottom',
@@ -213,6 +222,8 @@ export default {
                         duration: 1000,
                         className: 'addToCartRight'
                     });
+                    store.dispatch('updateCartCount');
+
 
                     setTimeout(() => {
                         router.push({

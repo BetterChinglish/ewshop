@@ -3,7 +3,7 @@ const mutations = {
         state.user.isLogin = payload;
     },
     setCartCount(state, payload) {
-        state.user.cartCount = payload.num;
+        state.user.cartCount = payload;
     }
 };
 
