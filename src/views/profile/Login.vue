@@ -160,6 +160,7 @@ export default {
                     // 返回, 从哪点进来注册就返回到哪个页面去
                     setTimeout(() => {
                         router.go(-1);
+                        store.dispatch('updateCartCount');
                     }, 500);
                 }
             })

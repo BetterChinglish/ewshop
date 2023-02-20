@@ -31,12 +31,15 @@
 </template>
 
 <script>
-import { nextTick, provide, ref, watchEffect } from '@vue/runtime-core';
+import { nextTick, onMounted, provide, ref, watchEffect } from '@vue/runtime-core';
 import {  useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 export default {
   name: 'App',
   setup() {
     let router = useRouter();
+    let store = useStore();
+
     let isDetail = ref(false);
     
     watchEffect(()=>{
@@ -48,6 +51,7 @@ export default {
       }
     })
 
+    // 刷新函数, 销毁再重新加载, 以起到刷新的左右
     let isRouterAlive = ref(true);
     let reload = ()=>{
       isRouterAlive.value = false;
@@ -57,6 +61,12 @@ export default {
     }
 
     provide('reload',reload);
+    onMounted(()=>{
+      // 确定购物车数量
+      store.dispatch('updateCartCount');
+      
+    })
+    // alert('本项目仅做学习使用，针对iPhone6/7/8编写\n未进行周密的页面布局与设备适配\n请在规格相近的手机端查看以确保最好的测试效果');
 
     return {
       isDetail,

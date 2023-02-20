@@ -61,6 +61,8 @@ export default {
                             path: '/login',
                         })
                     }, 500);
+
+                    store.state.user.cartCount = 0;
                 }
             });
         };

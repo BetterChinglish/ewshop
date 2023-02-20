@@ -183,7 +183,7 @@ export default {
 
             addCart({goods_id: id.value, num: 1}).then(res => {
                 showAddToCart.value = false;
-                if(res.status== '201') {
+                if(String.prototype.slice.call(res.status, 0, 1) == '2') {
                     showToast({
                         message: '添加成功! 在购物车里等你~',
                         type: 'success',
@@ -192,14 +192,7 @@ export default {
                     });
                     store.dispatch('updateCartCount');
                 }
-                else if(res.status=='204') {
-                    showToast({
-                        message: '已在购物车, 快去结算吧~',
-                        type: 'success',
-                        duration: 2000,
-                        className: 'addToCartRight'
-                    });
-                }
+                
                 else {
                     showNotify({
                         message: 'something wrong',
@@ -223,7 +216,7 @@ export default {
                         className: 'addToCartRight'
                     });
                     store.dispatch('updateCartCount');
-
+                
 
                     setTimeout(() => {
                         router.push({

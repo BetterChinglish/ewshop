@@ -1,10 +1,15 @@
 import { getCartData } from 'network/cart.js';
 
 const actions = {
-    updateCartCount({commit}) {
+    updateCartCount({ commit }) {
+        let num = 0;
         getCartData().then(res => {
-            console.log(res);
-            commit('setCartCount', res.data ? res.data.length : 0)
+            if (res.data) {
+                for (let i = 0; i < res.data.length; i++) {
+                    num += Number(res.data[i].num);
+                }
+                commit('setCartCount', num);
+            }
         })
     }
 };

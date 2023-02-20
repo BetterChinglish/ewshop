@@ -64,6 +64,7 @@ import HomeSwiper from 'views/home/childComps/HomeSwiper.vue';
 import { getHomeAllData, getHomeGoods } from "network/home";
 import { onMounted, ref, reactive, computed, watchEffect, nextTick } from "vue";
 import BScroll from "better-scroll";
+import store from '@/store';
 
 // 导入的组件
 
@@ -83,6 +84,7 @@ export default {
   },
 
   setup() {
+
     // 控制书籍类型选项栏是否显示, 以达到粘性固定的效果
     let isTabFixed = ref(false);
     let isBackTopShow = ref(false);   // 将放回顶部按钮跟随书籍选项栏一起显示隐藏
@@ -127,6 +129,8 @@ export default {
     let banners = ref([]);
 
     onMounted(() => {
+
+
       // console.log(banref.value);
 
       getHomeAllData().then((result) => {
@@ -178,6 +182,8 @@ export default {
                   ';\n当前高度: '+ document.querySelector('.content').clientHeight);
         // 
       });
+
+
     });
 
  
