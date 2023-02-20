@@ -6,7 +6,7 @@ import mutations from './mutations';
 const state = {
   user: {
     isLogin: window.localStorage.getItem('ewshopToken') ? true : false,
-    
+    cartCount: 0,
   }
 }
 

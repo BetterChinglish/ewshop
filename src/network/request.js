@@ -5,8 +5,6 @@ export function request(config) {
     const instance = axios.create({
         baseURL: 'https://api.shop.eduwork.cn',
         timeout: 5000,
-
-
     })
 
     // 请求拦截
@@ -21,7 +19,7 @@ export function request(config) {
         return config;
 
     }, err => { 
-
+        return Promise.reject(err);
     })
 
 
@@ -55,12 +53,9 @@ export function request(config) {
 
         // 响应有错误在此处理, 显示错误信息
         return err.response;
-        
-
-
+        // 或者使用promise返回, 处理更得当
+        // return Promise.reject(err.response);
     })
 
     return instance(config);
-
-
 }

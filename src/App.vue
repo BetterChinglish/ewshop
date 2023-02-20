@@ -13,7 +13,7 @@
 
     <router-link class="tab-bar-item" to="/shopcart">
       <div class="icon">
-        <van-badge :content="0" max="99">
+        <van-badge :content="$store.state.user.cartCount" max="99">
           <i class="iconfont icon-gouwugouwuchedinggou"></i>
         </van-badge>
       </div>

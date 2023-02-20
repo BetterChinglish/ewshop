@@ -69,6 +69,7 @@
         <div class="detailWhiteSpace"></div>
 
         
+        <van-loading type="spinner" class="loadingicon" size="32px" v-show="showAddToCart"/>
 
 
         <div class="bottomTab">
@@ -89,6 +90,9 @@ import {useRoute, useRouter} from 'vue-router';
 import { ref, onMounted, reactive, toRefs, nextTick, provide, watch,inject } from 'vue';
 import {getDetail} from 'network/detail.js';
 import GoodsList from "components/content/goods/GoodsList.vue";
+import { addCart } from 'network/cart.js';
+import { showNotify, showToast } from 'vant';
+
 export default {
     name: 'Detail',
     components: {
@@ -167,14 +171,65 @@ export default {
 
         })
 
+        // 控制加入购物车时由于延迟而添加的加载图标
+        let showAddToCart = ref(false);
         // 点击添加到购物车按钮触发的函数
         let addToCart = () => {
+            showAddToCart.value = true;
+            console.log('addToCart');
 
+
+            addCart({goods_id: id.value, num: 1}).then(res => {
+                if(String.prototype.slice.call(res.status, 0, 1) == '2') {
+                    showAddToCart.value = false;
+
+                    showToast({
+                        message: '添加成功! 在购物车里等你~',
+                        type: 'success',
+                        duration: 2000,
+                        className: 'addToCartRight'
+                    })
+                }
+                else {
+                    showAddToCart.value = false;
+                    showNotify({
+                        message: 'something wrong',
+                        position: 'bottom',
+                        type: 'warning',
+                    });
+                }
+            })
         }
 
         // 点击立即购买按钮时触发的函数
         let goToCart = () => {
+            addCart({goods_id: id.value, num: 1}).then(res => {
+                if(String.prototype.slice.call(res.status, 0, 1) == '2') {
+                    showAddToCart.value = false;
 
+                    showToast({
+                        message: '添加成功! 跳转到购物车',
+                        type: 'success',
+                        duration: 1000,
+                        className: 'addToCartRight'
+                    });
+
+                    setTimeout(() => {
+                        router.push({
+                            path: '/shopcart',
+                        });
+                    }, 500);
+
+                }
+                else {
+                    showAddToCart.value = false;
+                    showNotify({
+                        message: 'something wrong',
+                        position: 'bottom',
+                        type: 'warning',
+                    });
+                }
+            })
         }
 
         // 返回需要的数据
@@ -185,6 +240,7 @@ export default {
             index,
             images,
             active,
+            showAddToCart,
 
             onChange,
             toShow,
@@ -198,7 +254,17 @@ export default {
 </script>
 
 <style lang="scss">
-
+.loadingicon {
+    position: fixed;
+    color: white;
+    background-color: rgb(54, 52, 52, 0.5);
+    left: calc(50vw - 40px);
+    top: calc(50vh - 40px);
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+    border-radius: 15%;
+}
 .aboutBook {
     .van-card {
         font-size: 16px;
@@ -241,5 +307,11 @@ export default {
 
     
 }
+.addToCartRight {
+    width: 50vw;
+}
 
+.addToCartRight i::before {
+    color: orange;
+}
 </style>
