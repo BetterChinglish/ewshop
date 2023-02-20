@@ -32,7 +32,7 @@ export function request(config) {
         return res.data ? res.data : res;
 
     }, err => { 
-        // 授权才可以访问的接口, 统一跳转登录以授权
+        // 授权才可以访问的接口, 统一跳转登录以授权, 401表示未授权
         if (err.response.status == '401') {
             if (router.currentRoute.value.fullPath == '/login') {
                 // 如果当前处于登录页面则交给登录页面代码做错误处理
