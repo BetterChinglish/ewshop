@@ -63,7 +63,9 @@ export default {
     provide('reload',reload);
     onMounted(()=>{
       // 确定购物车数量
-      store.dispatch('updateCartCount');
+      if(window.localStorage.getItem('ewshopToken')) {
+        store.dispatch('updateCartCount');
+      }
       
     })
     // alert('本项目仅做学习使用，针对iPhone6/7/8编写\n未进行周密的页面布局与设备适配\n请在规格相近的手机端查看以确保最好的测试效果');
