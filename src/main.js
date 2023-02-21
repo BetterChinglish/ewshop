@@ -5,7 +5,7 @@ import store from './store';
 // 样式
 import 'vant/es/toast/style';
 import 'vant/es/notify/style';
-import { Lazyload, Notify, Toast   } from 'vant';
+import { Lazyload, Notify, Toast, SwipeCell    } from 'vant';
 
 
 createApp(App)
@@ -15,6 +15,7 @@ createApp(App)
         
     })
     .use(Notify)
+    .use(SwipeCell)
     .use(Toast)
     .use(store)
     .use(router)
