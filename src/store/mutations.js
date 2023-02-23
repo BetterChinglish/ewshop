@@ -4,6 +4,12 @@ const mutations = {
     },
     setCartCount(state, payload) {
         state.user.cartCount = payload;
+    },
+    cartCountAdd(state) {
+        state.user.cartCount++;
+    },
+    cartCountSub(state) {
+        state.user.cartCount--;
     }
 };
 

@@ -21,7 +21,7 @@
             <van-checkbox-group v-model="checkedId" ref="checkboxGroup">
 
                 <!-- 使用v-for展示添加的每种商品 -->
-                <div class="goodsItem" v-for="item in cartList" :key="item.id">
+                <div class="goodsItem" v-for="(item, index) in cartList" :key="item.id">
                     <!-- 
                         name 唯一标识符
                         v-model 是否选中
@@ -50,6 +50,10 @@
                                 button-size="22" 
                                 disable-input 
                                 integer
+                                min="1"
+                                :max="item.stock"
+                                :before-change="stepperBeforeChange(index)"
+                                :long-press="false"
                             />
                             </template>
                         </van-card>
@@ -77,10 +81,12 @@
 
 <script>
 import NavBar from '@/components/common/navbar/NavBar.vue';
-import { getCartData } from 'network/cart.js';
+import { getCartData, modifyCart } from 'network/cart.js';
 import { getDetail } from 'network/detail.js';
 
 import { reactive } from '@vue/reactivity';
+import { closeToast, showLoadingToast, showNotify } from 'vant';
+import store from '@/store';
 export default {
     name: 'Shopcart',
     components: {
@@ -89,6 +95,43 @@ export default {
     setup() {
         const cartList = reactive([]);
         const checkedId = reactive([]);
+
+        const stepperBeforeChange = (index) => {
+            let i = index;
+            return function(value) {
+                // console.log(i, value);
+                showLoadingToast({forbidClick: true});
+                modifyCart(cartList[index].id, {num: value}).then(res=>{
+                    // console.log(res);
+                    if(res.status == '204') {
+                        // console.log('value: ' + value);
+                        // console.log('cartList num: ' + cartList[index].num);
+
+                        // value大于存储的num，点了加号按钮，则购物车数量直接+1
+                        if (value > cartList[index].num) {
+                            store.commit('cartCountAdd');
+                        }
+                        else if(value < cartList[index].num) {
+                            store.commit('cartCountSub');
+                        }
+                        cartList[index].num = value;
+                        closeToast();
+                        
+                    }else {
+                        closeToast();
+                        showNotify('something wrong');
+                        return new Promise((resolve)=>{
+                            resolve(false);
+                        })
+                    }
+                })
+
+
+                // return new Promise((resolve)=>{
+                //     resolve(false);
+                // })
+            }
+        };
         getCartData().then(res=>{
             // console.log(res);
             cartList.push(...res.data);
@@ -117,6 +160,7 @@ export default {
         return {
             cartList,
             checkedId,
+            stepperBeforeChange
         }
     }
     
