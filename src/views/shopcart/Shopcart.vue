@@ -50,6 +50,7 @@
                                 class="itemGoodsCard"
                                 :title="item.title"
                                 :thumb="item.cover_url"
+                                @click="toDetail(item.goods_id)"
                             >
                                 <template #footer>
                                     <van-stepper 
@@ -99,12 +100,14 @@ import { reactive, ref, toRaw } from '@vue/reactivity';
 import { closeToast, showLoadingToast, showNotify } from 'vant';
 import store from '@/store';
 import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 export default {
     name: 'Shopcart',
     components: {
         NavBar,
     },
     setup() {
+        const router = useRouter();
 
         // 商品信息
         const cartList = reactive([]);
@@ -114,6 +117,15 @@ export default {
 
         // 删除商品时直接不显示， 向服务器发送请求服务器的数据库发生改变即可
         const showItem = reactive([]);
+
+        const toDetail = (id)=>{
+            router.push({
+                path:'detail',
+                query: {
+                    id
+                }
+            });
+        }
 
         const beforeCardClose = (id, index) =>{
             let cart_id = id;
@@ -286,7 +298,8 @@ export default {
 
             stepperBeforeChange,
             toggle,
-            beforeCardClose
+            beforeCardClose,
+            toDetail,
         }
     }
     
