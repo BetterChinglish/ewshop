@@ -22,53 +22,56 @@
             <van-checkbox-group v-model="checkedId" ref="checkboxGroup">
                
                 <!-- 使用v-for展示添加的每种商品 -->
-                <div class="goodsItem" v-for="(item, index) in cartList" :key="item.id">
+                <div v-for="(item, index) in cartList" :key="item.id" >
                     <!-- 
                         name 唯一标识符
                         v-model 是否选中
                     -->
-                    <van-checkbox
-                        :name="item.id" 
-                        class="itemCheckbox" 
-                        @click='toggle(item.id)'
-                        @click.stop
-                    >
-                    </van-checkbox>
-
-                    <van-swipe-cell :before-close="beforeCardClose(item.id)">
-                        <!-- <van-card
-                            num="3"
-                            price="2.00"
-                            title="商品标题"
-                            class="itemGoodsCard"
-                            thumb="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
-                        /> -->
-                        <van-card
-                            :num="item.stock"
-                            :price="item.price+'.00'"
-                            class="itemGoodsCard"
-                            :title="item.title"
-                            :thumb="item.cover_url"
+                    <div v-if="showItem[index]"  class="goodsItem">
+                        <van-checkbox
+                            :name="item.id" 
+                            class="itemCheckbox" 
+                            @click='toggle(item.id)'
+                            @click.stop
                         >
-                            <template #footer>
-                                <van-stepper 
-                                v-model="item.num" 
-                                theme="round" 
-                                button-size="22" 
-                                disable-input 
-                                integer
-                                min="1"
-                                :max="item.stock"
-                                :before-change="stepperBeforeChange(index)"
-                                :long-press="false"
-                            />
-                            </template>
-                        </van-card>
+                        </van-checkbox>
 
-                        <template #right>
-                            <van-button square text="删除" type="danger" class="itemGoodsDeleteBtn"/>
-                        </template>
-                    </van-swipe-cell>
+                        <van-swipe-cell :before-close="beforeCardClose(item.id, index)">
+                            <!-- <van-card
+                                num="3"
+                                price="2.00"
+                                title="商品标题"
+                                class="itemGoodsCard"
+                                thumb="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
+                            /> -->
+                            <van-card
+                                :num="item.stock"
+                                :price="item.price+'.00'"
+                                class="itemGoodsCard"
+                                :title="item.title"
+                                :thumb="item.cover_url"
+                            >
+                                <template #footer>
+                                    <van-stepper 
+                                    v-model="item.num" 
+                                    theme="round" 
+                                    button-size="22" 
+                                    disable-input 
+                                    integer
+                                    min="1"
+                                    :max="item.stock"
+                                    :before-change="stepperBeforeChange(index)"
+                                    :long-press="false"
+                                />
+                                </template>
+                            </van-card>
+
+                            <template #right>
+                                <van-button square text="删除" type="danger" class="itemGoodsDeleteBtn"/>
+                            </template>
+                        </van-swipe-cell>
+                    </div>
+                    
                 </div>
 
 
@@ -102,11 +105,21 @@ export default {
         NavBar,
     },
     setup() {
+
+        // 商品信息
         const cartList = reactive([]);
+
+        // 确定勾选的商品id
         let checkedId = reactive([]);
 
-        const beforeCardClose = (id) =>{
+        // 删除商品时直接不显示， 向服务器发送请求服务器的数据库发生改变即可
+        const showItem = reactive([]);
+
+        const beforeCardClose = (id, index) =>{
             let cart_id = id;
+            let cart_list_index = index;
+
+            // 利用闭包
             return function( { position } ) {
                 showLoadingToast({forbidClick: true});
 
@@ -114,11 +127,28 @@ export default {
                      case 'right':
                         deleteCartItem(cart_id).then(res=>{
                             console.log(res);
+                            // 204成功, 数据库已经发生改变, 只需要对当前的商品进行隐藏即可, v-if或v-show都行
                             if(res.status == '204') {
-                                
+                                showItem[cart_list_index] = false;
+
+                                // 隐藏后需要确定checkedId是否存在, 如果存在则删除, 以免导致其他部分异常
+                                if(checkedId.indexOf(id)) {
+                                    checkedId.splice(checkedId.indexOf(id), 1);
+                                }
+                                closeToast();
+
+                            }
+                            // 否则显示异常不处理即可
+                            else {
+                                closeToast();
+                                showNotify({
+                                    message: 'something wrong',
+                                    type: 'warning',
+                                    duration: 1500
+                                })
+
                             }
 
-                            closeToast();
                         })
                 }
                 
@@ -213,7 +243,7 @@ export default {
         onMounted(()=>{
             // 初始化数据
             getCartData().then(res=>{
-                console.log(res);
+                // console.log(res);
                 // 购物车数据添加
                 cartList.push(...res.data);
                 // console.log(cartList);
@@ -225,7 +255,8 @@ export default {
                     if (cartList[index].is_checked == 1) {
                         checkedId.push(cartList[index].id);
                     }
-                
+
+                    showItem[index] = true;
                     
 
                     // 获取商品详情
@@ -239,8 +270,7 @@ export default {
                     })
 
                 }
-                console.log(cartList);
-                // console.log(checkedId);
+                console.log(showItem);
 
 
                 
@@ -251,6 +281,8 @@ export default {
         return {
             cartList,
             checkedId,
+            showItem,
+
             stepperBeforeChange,
             toggle,
             beforeCardClose
