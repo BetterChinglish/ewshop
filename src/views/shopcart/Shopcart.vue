@@ -121,10 +121,11 @@ export default {
 
             // 利用闭包
             return function( { position } ) {
-                showLoadingToast({forbidClick: true});
 
                 switch(position){ 
                      case 'right':
+                        showLoadingToast({forbidClick: true});
+
                         deleteCartItem(cart_id).then(res=>{
                             console.log(res);
                             // 204成功, 数据库已经发生改变, 只需要对当前的商品进行隐藏即可, v-if或v-show都行

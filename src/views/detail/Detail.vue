@@ -74,7 +74,7 @@
 
         <div class="bottomTab">
             <van-button class="addToCart" color="orange" @click="addToCart">加入购物车</van-button>
-            <van-button class="buyRightNow" color="red" @click="goToCart">立即购买</van-button>
+            <van-button class="buyRightNow" color="red" @click="goToCart">购物车结算</van-button>
         </div>
 
     </div>

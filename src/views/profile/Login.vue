@@ -159,7 +159,9 @@ export default {
 
                     // 返回, 从哪点进来注册就返回到哪个页面去
                     setTimeout(() => {
-                        router.go(-1);
+                        router.push({
+                            path: '/'
+                        });
                         store.dispatch('updateCartCount');
                     }, 500);
                 }
