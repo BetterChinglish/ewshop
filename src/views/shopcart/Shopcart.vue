@@ -48,10 +48,34 @@
                                 :num="item.stock"
                                 :price="item.price+'.00'"
                                 class="itemGoodsCard"
-                                :title="item.title"
+                                :lazy-load="true"
                                 :thumb="item.cover_url"
-                                @click="toDetail(item.goods_id)"
                             >
+                                <template #title>
+                                    <div style="font-size: 14px" @click="toDetail(item.goods_id)">
+                                        {{item.title}}
+                                    </div>
+                                </template>
+
+                                <template #thumb>
+                                    <div>
+                                        <van-image 
+                                            :src="item.cover_url"
+                                            width="88"
+                                            height="100"
+                                            lazy-load
+                                        >
+                                            <template v-slot:loading>
+                                                <van-loading type="spinner" size="20" />
+                                            </template>
+                                        </van-image>
+                                    </div>
+                                </template>
+                                <template #num>
+                                    <div>
+                                        库存: {{item.stock}}
+                                    </div>
+                                </template>
                                 <template #footer>
                                     <van-stepper 
                                     v-model="item.num" 
@@ -148,6 +172,9 @@ export default {
                                 if(checkedId.indexOf(id)) {
                                     checkedId.splice(checkedId.indexOf(id), 1);
                                 }
+
+                                // 还需要更新购物车数量
+                                store.commit('cartCountSubNum', cartList[cart_list_index].num)
                                 closeToast();
 
                             }

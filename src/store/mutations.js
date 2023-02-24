@@ -10,6 +10,9 @@ const mutations = {
     },
     cartCountSub(state) {
         state.user.cartCount--;
+    },
+    cartCountSubNum(state, payload) {
+        state.user.cartCount -= payload;
     }
 };
 
