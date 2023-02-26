@@ -61,7 +61,6 @@ import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { getUser } from 'network/user';
 import { onMounted, reactive, toRefs } from 'vue';
-import { addressData } from 'network/address.js'
 export default {
     name: 'Profile',
     components: {

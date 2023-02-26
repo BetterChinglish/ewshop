@@ -1,8 +1,8 @@
 import { request } from "./request";
 // 省市县数据
-export function addressData() {
+export function addressData(pid) {
     return request({
-        url: '/api/city',
+        url: `/api/city?pid=${pid}`,
         method: 'get',
     })
 }
