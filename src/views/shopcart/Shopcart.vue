@@ -129,7 +129,7 @@ import { getCartData, modifyCart, checkedCart, deleteCartItem } from 'network/ca
 import { getDetail } from 'network/detail.js';
 
 import { markRaw, reactive, ref, toRaw } from '@vue/reactivity';
-import { closeToast, showLoadingToast, showNotify } from 'vant';
+import { closeToast, showLoadingToast, showNotify, showToast } from 'vant';
 import store from '@/store';
 import { computed, onMounted, watch, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
@@ -169,20 +169,34 @@ export default {
         // 总价
         const totalPrice = computed(() => {
             let price = 0;
-            for (let index in cartList) {
-                // console.log(cartList[index].price);
-                
-                if (checkedId.indexOf(cartList[index].id) != -1) {
-                    price += cartList[index].price * cartList[index].num;
-                }
+            if (cartList.length == 0) {
+                return 0;
             }
-
-            return price * 100;
+            else {
+                for (let index in cartList) {
+                    // console.log(cartList[index].price);
+                    
+                    if (checkedId.indexOf(cartList[index].id) != -1) {
+                        price += cartList[index].price * cartList[index].num;
+                    }
+                }
+                return price * 100;
+            }
+            
         })
         
 
         const onSubmit = () => {
-
+            if (checkedId.length == 0) {
+                showToast({
+                    message: '请最少选择一个商品进行结算',
+                })
+            }
+            else {
+                router.push({
+                    path: '/createorder',
+                });
+            }
         }
 
         const toggleAll = () => {
@@ -427,6 +441,8 @@ export default {
 
                 
             })
+
+            
         })
         
 

@@ -8,6 +8,8 @@ const Profile = () => import(/* webpackChunkName: "profile" */ '../views/profile
 const Shopcart = () => import(/* webpackChunkName: "shopcart" */ '../views/shopcart/Shopcart.vue');
 const Register = () => import(/* webpackChunkName: "Register" */ '../views/profile/Register.vue');
 const Login = () => import(/* webpackChunkName: "Login" */ '../views/profile/Login.vue');
+const Address = () => import(/* webpackChunkName: "Address" */ '../views/profile/Address.vue');
+const AddressEdit = () => import(/* webpackChunkName: "AddressEdit" */ '../views/profile/AddressEdit.vue');
 
 const routes = [
   {
@@ -80,6 +82,25 @@ const routes = [
     component: Login,
     meta: {
       title: '用户登录'
+    }
+  },
+
+  {
+    path: '/address',
+    name: 'Address',
+    component: Address,
+    meta: {
+      title: '地址管理',
+      isAuthRequired: true
+    }
+  },
+  {
+    path: '/addressedit',
+    name: 'AddressEdit',
+    component: AddressEdit,
+    meta: {
+      title: '地址编辑',
+      isAuthRequired: true
     }
   },
 
