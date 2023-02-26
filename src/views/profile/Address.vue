@@ -64,11 +64,19 @@ export default {
             getAddressList().then(res => {
                 list.push(...res.data);
                 for (let i = 0; i < list.length; i++) {
+
+                    // 适配vant组件属性tel与isDefault
                     list[i].tel = computed(()=>list[i].phone)
                     list[i].isDefault = computed(()=>list[i].is_default == 1 ? true : false)
+
+                    // 选中默认地址
                     if (list[i].is_default == 1) {
                         chosenAddressId.value = list[i].id;
                     }
+                }
+                // 如果没有设置默认地址, 则选中第一个, 如果没有地址, 仍未空
+                if (chosenAddressId.value == null && list.length!=0) {
+                    chosenAddressId.value = list[0].id;
                 }
             })
         })
