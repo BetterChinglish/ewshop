@@ -10,7 +10,7 @@
       <!-- <template v-slot:right>
       </template> -->
     </nav-bar>
-    <van-divider dashed class="notify">
+    <van-divider dashed class="notify" v-if="list.length==0">
         您还没有地址哦! 快去添加一个吧~
     </van-divider>
     
@@ -28,7 +28,7 @@
 </template>
 
 <script scoped>
-import { ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { showToast } from 'vant';
 import NavBar from '@/components/common/navbar/NavBar.vue';
 import { getAddressList } from '@/network/address';
@@ -42,21 +42,15 @@ export default {
 
     setup() {
         const chosenAddressId = ref('1');
-        const list = [
-            {
-                id: '1',
-                name: '张三',
-                tel: '13000000000',
-                address: '浙江省杭州市西湖区文三路 138 号东方通信大厦 7 楼 501 室',
-                isDefault: true,
-            },
-            {
-                id: '2',
-                name: '李四',
-                tel: '1310000000',
-                address: '浙江省杭州市拱墅区莫干山路 50 号',
-            },
-        ];
+        const list = reactive([]);
+        // [{
+        //     id: '1',
+        //     name: '张三',
+        //     tel: '13000000000',
+        //     address: '浙江省杭州市西湖区文三路 138 号东方通信大厦 7 楼 501 室',
+        //     isDefault: true,
+        // }]
+       
 
         // 添加地址
         const onAdd = () => {
@@ -66,6 +60,16 @@ export default {
         };
         const onEdit = (item, index) => showToast('编辑地址:' + index);
 
+        onMounted(() => {
+            getAddressList().then(res => {
+                list.push(...res.data);
+                for (let i = 0; i < list.length; i++) {
+                    list[i].tel = computed(()=>list[i].phone)
+                    list[i].isDefault = computed(()=>list[i].is_default == 1 ? true : false)
+                }
+                console.log(res);
+            })
+        })
         return {
             list,
             onAdd,
@@ -90,5 +94,7 @@ export default {
         margin-bottom: 100px;
     }
 }
-
+.van-address-item__address {
+    text-align: left;
+}
 </style>
