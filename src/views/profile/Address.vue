@@ -96,12 +96,14 @@ export default {
 }
 .addressList{
     margin-top: 50px;
+    margin-bottom: 100px;
     // height: 85vh;
     // background-color: #d8d7d7;
     
 
     .van-address-list__bottom {
         margin-bottom: 100px;
+        position: fixed;
     }
 }
 .van-address-item__address {
