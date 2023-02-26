@@ -58,7 +58,7 @@
                                 </template>
 
                                 <template #thumb>
-                                    <div>
+                                    <div @click="toDetail(item.goods_id)">
                                         <van-image 
                                             :src="item.cover_url"
                                             width="88"
@@ -100,15 +100,23 @@
                 </div>
 
 
-                <div class="cart_accounts"></div>
+                
 
             </van-checkbox-group>
         </div>
 
+        <div class="cart_accounts">
+                <van-submit-bar :price="totalPrice" button-text="提交订单" @submit="onSubmit">
+                    <van-checkbox v-model="toggleAllChecked" @click="toggleAll()">全选</van-checkbox>
+                </van-submit-bar>
+        </div>
+
+
+
     </div>
 
     
-
+    
 
 
 
@@ -120,10 +128,10 @@ import NavBar from '@/components/common/navbar/NavBar.vue';
 import { getCartData, modifyCart, checkedCart, deleteCartItem } from 'network/cart.js';
 import { getDetail } from 'network/detail.js';
 
-import { reactive, ref, toRaw } from '@vue/reactivity';
+import { markRaw, reactive, ref, toRaw } from '@vue/reactivity';
 import { closeToast, showLoadingToast, showNotify } from 'vant';
 import store from '@/store';
-import { onMounted } from 'vue';
+import { computed, onMounted, watch, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 export default {
     name: 'Shopcart',
@@ -139,8 +147,111 @@ export default {
         // 确定勾选的商品id
         let checkedId = reactive([]);
 
+        // 确定删除按钮成功次数, 即多少项被删除
+        let hasBeenDeleted = ref(0);
+
         // 删除商品时直接不显示， 向服务器发送请求服务器的数据库发生改变即可
         const showItem = reactive([]);
+        const checkboxGroup = ref(null)
+
+        // 全选按钮
+        const toggleAllChecked = ref(false);
+        watchEffect( () => {
+            // console.log('cartList_length: ', cartList.length);
+            if (checkedId.length == cartList.length - hasBeenDeleted.value) {
+                toggleAllChecked.value = true;
+            }
+            else {
+                toggleAllChecked.value = false;
+            }
+        })
+
+        // 总价
+        const totalPrice = computed(() => {
+            let price = 0;
+            for (let index in cartList) {
+                // console.log(cartList[index].price);
+                
+                if (checkedId.indexOf(cartList[index].id) != -1) {
+                    price += cartList[index].price * cartList[index].num;
+                }
+            }
+
+            return price * 100;
+        })
+        
+
+        const onSubmit = () => {
+
+        }
+
+        const toggleAll = () => {
+            showLoadingToast({ forbidClick: true });
+            let arr = markRaw([]);
+            arr.push(...checkedId);
+
+            // 全选
+            if (toggleAllChecked.value) {
+                for (let i = 0; i < cartList.length; i++) {
+                    if (checkedId.indexOf(cartList[i].id) == -1) {
+                        checkedId.push(cartList[i].id);
+                    }
+                }
+
+                // 向服务器提交
+                checkedCart({ cart_ids: checkedId }).then(res => {
+                    console.log(res);
+                    // 成功关闭
+                    if (res.status == '204') {
+                        closeToast();
+                    }
+                    // 失败显示失败并恢复checkedId
+                    else {
+                        closeToast();
+                        showNotify({
+                            message: 'something wrong',
+                            type: 'warning',
+                            duration: 1500
+                        });
+
+                        for (let i = 0; i < checkedId.length; i++) {
+                            if (arr.indexOf(checkedId[i]) == -1) {
+                                checkedId.splice(checkedId.indexOf(checkedId[i]), 1)
+                            }
+                        }
+                    }
+                })
+            }
+            // 全不选
+            else {
+                checkedId.splice(0);
+                // 向服务器提交
+                checkedCart({ cart_ids: checkedId }).then(res => {
+                    console.log(res);
+                    // 成功关闭
+                    if (res.status == '204') {
+                        closeToast();
+                    }
+                    // 失败显示失败并恢复checkedId
+                    else {
+                        closeToast();
+                        showNotify({
+                            message: 'something wrong',
+                            type: 'warning',
+                            duration: 1500
+                        });
+
+                        for (let i = 0; i < checkedId.length; i++) {
+                            if (arr.indexOf(checkedId[i]) == -1) {
+                                checkedId.splice(checkedId.indexOf(checkedId[i]), 1)
+                            }
+                        }
+                    }
+                })
+            }
+
+            
+        }
 
         const toDetail = (id)=>{
             router.push({
@@ -173,9 +284,10 @@ export default {
                                     checkedId.splice(checkedId.indexOf(id), 1);
                                 }
 
-                                // 还需要更新购物车数量
+                                // 还需要更新购物车数量,
                                 store.commit('cartCountSubNum', cartList[cart_list_index].num)
                                 closeToast();
+                                hasBeenDeleted.value++;
 
                             }
                             // 否则显示异常不处理即可
@@ -310,7 +422,7 @@ export default {
                     })
 
                 }
-                console.log(showItem);
+                // console.log(showItem);
 
 
                 
@@ -322,11 +434,16 @@ export default {
             cartList,
             checkedId,
             showItem,
+            toggleAllChecked,
+            checkboxGroup,
+            totalPrice,
 
             stepperBeforeChange,
             toggle,
             beforeCardClose,
             toDetail,
+            toggleAll,
+            onSubmit,
         }
     }
     
@@ -334,6 +451,7 @@ export default {
 </script>
 
 <style lang="scss">
+
 .cart {
     margin-top: 60px;
 }
@@ -347,7 +465,16 @@ export default {
     justify-content: center;
     align-items: center;
 }
+.cart_accounts {
+    position: fixed;
+    left: 0px;
+    width: 100vw;
+    background-color: skyblue;
+}
 
+.van-submit-bar {
+    bottom: 50px;
+} 
 .itemCheckbox {
     width: 8vw;
     height: 100%;
