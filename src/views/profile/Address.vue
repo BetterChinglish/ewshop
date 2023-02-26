@@ -41,7 +41,7 @@ export default {
     },
 
     setup() {
-        const chosenAddressId = ref('1');
+        const chosenAddressId = ref();
         const list = reactive([]);
         // [{
         //     id: '1',
@@ -51,7 +51,7 @@ export default {
         //     isDefault: true,
         // }]
        
-
+            
         // 添加地址
         const onAdd = () => {
             router.push({
@@ -66,8 +66,10 @@ export default {
                 for (let i = 0; i < list.length; i++) {
                     list[i].tel = computed(()=>list[i].phone)
                     list[i].isDefault = computed(()=>list[i].is_default == 1 ? true : false)
+                    if (list[i].is_default == 1) {
+                        chosenAddressId.value = list[i].id;
+                    }
                 }
-                console.log(res);
             })
         })
         return {
