@@ -19,24 +19,22 @@
 
         <div class="cart_body">
             <!-- v-model 所有选中项的标识符 -->
-            <van-checkbox-group v-model="checkedId" ref="checkboxGroup">
+            <van-checkbox-group 
+                v-model="checkedId" 
+                ref="checkboxGroup"
+                @change="groupChange"
+            >
                
                 <!-- 使用v-for展示添加的每种商品 -->
-                <div v-for="(item, index) in cartList" :key="item.id" >
-                    <!-- 
-                        name 唯一标识符
-                        v-model 是否选中
-                    -->
-                    <div v-if="showItem[index]"  class="goodsItem">
+                <div v-for="(item, index) in cartList" :key="index" >
+                    <div  class="goodsItem">
                         <van-checkbox
                             :name="item.id" 
                             class="itemCheckbox" 
-                            @click='toggle(item.id)'
-                            @click.stop
                         >
                         </van-checkbox>
 
-                        <van-swipe-cell :before-close="beforeCardClose(item.id, index)">
+                        <van-swipe-cell>
                             <!-- <van-card
                                 num="3"
                                 price="2.00"
@@ -45,22 +43,21 @@
                                 thumb="https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg"
                             /> -->
                             <van-card
-                                :num="item.stock"
-                                :price="item.price+'.00'"
+                                :num="item.goods.stock"
+                                :price="item.goods.price+'.00'"
                                 class="itemGoodsCard"
                                 :lazy-load="true"
-                                :thumb="item.cover_url"
                             >
                                 <template #title>
                                     <div style="font-size: 14px" @click="toDetail(item.goods_id)">
-                                        {{item.title}}
+                                        {{item.goods.title}}
                                     </div>
                                 </template>
 
                                 <template #thumb>
                                     <div @click="toDetail(item.goods_id)">
                                         <van-image 
-                                            :src="item.cover_url"
+                                            :src="item.goods.cover_url"
                                             width="88"
                                             height="100"
                                             lazy-load
@@ -73,26 +70,34 @@
                                 </template>
                                 <template #num>
                                     <div>
-                                        库存: {{item.stock}}
+                                        库存: {{item.goods.stock}}
                                     </div>
                                 </template>
                                 <template #footer>
                                     <van-stepper 
-                                    v-model="item.num" 
-                                    theme="round" 
-                                    button-size="22" 
-                                    disable-input 
-                                    integer
-                                    min="1"
-                                    :max="item.stock"
-                                    :before-change="stepperBeforeChange(index)"
-                                    :long-press="false"
-                                />
+                                        :name="item.id"
+                                        v-model="item.num" 
+                                        theme="round" 
+                                        button-size="22" 
+                                        disable-input 
+                                        integer
+                                        min="1"
+                                        :max="item.goods.stock"
+                                        :long-press="false"
+                                        @plus="addItemNum(index)"
+                                        @minus="subItemNum(index)"
+                                    />
                                 </template>
                             </van-card>
 
                             <template #right>
-                                <van-button square text="删除" type="danger" class="itemGoodsDeleteBtn"/>
+                                <van-button 
+                                    square 
+                                    text="删除" 
+                                    type="danger" 
+                                    class="itemGoodsDeleteBtn"
+                                    @click="deleteGood(item.id)"
+                                />
                             </template>
                         </van-swipe-cell>
                     </div>
@@ -100,25 +105,20 @@
                 </div>
 
 
-                
-
             </van-checkbox-group>
-        </div>
 
-        <div class="cart_accounts">
+            <div class="cart_accounts">
                 <van-submit-bar :price="totalPrice" button-text="提交订单" @submit="onSubmit">
                     <van-checkbox v-model="toggleAllChecked" @click="toggleAll()">全选</van-checkbox>
                 </van-submit-bar>
+            </div>
         </div>
+
+        
 
 
 
     </div>
-
-    
-    
-
-
 
 </div>
 </template>
@@ -127,147 +127,67 @@
 import NavBar from '@/components/common/navbar/NavBar.vue';
 import { getCartData, modifyCart, checkedCart, deleteCartItem } from 'network/cart.js';
 import { getDetail } from 'network/detail.js';
-
 import { markRaw, reactive, ref, toRaw } from '@vue/reactivity';
-import { closeToast, showLoadingToast, showNotify, showToast } from 'vant';
+import { closeToast, showLoadingToast, showNotify, showToast, Toast } from 'vant';
 import store from '@/store';
-import { computed, onMounted, watch, watchEffect } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, onMounted, watch, watchEffect, toRefs } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 export default {
     name: 'Shopcart',
     components: {
         NavBar,
     },
     setup() {
+        const state = reactive({
+            cartList: [],
+            checkedId: [],
+            toggleAllChecked: false
+        });
+
         const router = useRouter();
 
-        // 商品信息
-        const cartList = reactive([]);
-
-        // 确定勾选的商品id
-        let checkedId = reactive([]);
-
-        // 确定删除按钮成功次数, 即多少项被删除
-        let hasBeenDeleted = ref(0);
-
-        // 删除商品时直接不显示， 向服务器发送请求服务器的数据库发生改变即可
-        const showItem = reactive([]);
-        const checkboxGroup = ref(null)
-
-        // 全选按钮
-        const toggleAllChecked = ref(false);
-        watchEffect( () => {
-            // console.log('cartList_length: ', cartList.length);
-            if (checkedId.length == cartList.length - hasBeenDeleted.value) {
-                toggleAllChecked.value = true;
-            }
-            else {
-                toggleAllChecked.value = false;
-            }
-        })
-        const testprice = ref(0);
-
-        // 总价
-        const totalPrice = computed(() => {
-            let price = 0;
-            if (cartList.length == 0) {
-                return price;
-            }
-            else {
-                for (let index in cartList) {
-                    // console.log(cartList[index].price);
-                    
-                    if (checkedId.indexOf(cartList[index].id) != -1) {
-                        price += cartList[index].price * cartList[index].num;
-                    }
-                }
-                return price * 100;
-            }
-            
-        })
         
-
         const onSubmit = () => {
-            if (checkedId.length == 0) {
+            // console.log('on submit');
+            if (state.checkedId.length == 0) {
                 showToast({
-                    message: '请最少选择一个商品进行结算',
+                    message: '请至少选中一样商品进行结算',
+                    type: 'fail',
+                    className: 'failToSubmit'
                 })
             }
+
             else {
                 router.push({
-                    path: '/createorder',
-                });
-            }
-        }
-
-        const toggleAll = () => {
-            showLoadingToast({ forbidClick: true });
-            let arr = markRaw([]);
-            arr.push(...checkedId);
-
-            // 全选
-            if (toggleAllChecked.value) {
-                for (let i = 0; i < cartList.length; i++) {
-                    if (checkedId.indexOf(cartList[i].id) == -1) {
-                        checkedId.push(cartList[i].id);
-                    }
-                }
-
-                // 向服务器提交
-                checkedCart({ cart_ids: checkedId }).then(res => {
-                    console.log(res);
-                    // 成功关闭
-                    if (res.status == '204') {
-                        closeToast();
-                    }
-                    // 失败显示失败并恢复checkedId
-                    else {
-                        closeToast();
-                        showNotify({
-                            message: 'something wrong',
-                            type: 'warning',
-                            duration: 1500
-                        });
-
-                        for (let i = 0; i < checkedId.length; i++) {
-                            if (arr.indexOf(checkedId[i]) == -1) {
-                                checkedId.splice(checkedId.indexOf(checkedId[i]), 1)
-                            }
-                        }
-                    }
+                    path: 'createorder'
                 })
             }
-            // 全不选
-            else {
-                checkedId.splice(0);
-                // 向服务器提交
-                checkedCart({ cart_ids: checkedId }).then(res => {
-                    console.log(res);
-                    // 成功关闭
-                    if (res.status == '204') {
-                        closeToast();
-                    }
-                    // 失败显示失败并恢复checkedId
-                    else {
-                        closeToast();
-                        showNotify({
-                            message: 'something wrong',
-                            type: 'warning',
-                            duration: 1500
-                        });
-
-                        for (let i = 0; i < checkedId.length; i++) {
-                            if (arr.indexOf(checkedId[i]) == -1) {
-                                checkedId.splice(checkedId.indexOf(checkedId[i]), 1)
-                            }
-                        }
-                    }
-                })
-            }
-
             
         }
 
+        // 初始化购物车数据
+        const init = () => {
+            showToast({
+                message: '加载中',
+                type: 'loading',
+                forbidClick: true
+            })
+
+            getCartData("include=goods").then(res => {
+                state.cartList = res.data;
+                state.checkedId = res.data.filter(n => n.is_checked == 1).map(item => item.id);
+                if (state.checkedId.length == state.cartList.length) {
+                    state.toggleAllChecked = true;
+                }
+                console.log(state.cartList);
+
+                closeToast();
+            })
+        }
+        onMounted(() => {
+            init();
+        })
+        // 点击商品标题和图片时跳转到商品详情
         const toDetail = (id)=>{
             router.push({
                 path:'detail',
@@ -277,189 +197,124 @@ export default {
             });
         }
 
-        const beforeCardClose = (id, index) =>{
-            let cart_id = id;
-            let cart_list_index = index;
-
-            // 利用闭包
-            return function( { position } ) {
-
-                switch(position){ 
-                     case 'right':
-                        showLoadingToast({forbidClick: true});
-
-                        deleteCartItem(cart_id).then(res=>{
-                            console.log(res);
-                            // 204成功, 数据库已经发生改变, 只需要对当前的商品进行隐藏即可, v-if或v-show都行
-                            if(res.status == '204') {
-                                showItem[cart_list_index] = false;
-
-                                // 隐藏后需要确定checkedId是否存在, 如果存在则删除, 以免导致其他部分异常
-                                if(checkedId.indexOf(id)) {
-                                    checkedId.splice(checkedId.indexOf(id), 1);
-                                }
-
-                                // 还需要更新购物车数量,
-                                store.commit('cartCountSubNum', cartList[cart_list_index].num)
-                                closeToast();
-                                hasBeenDeleted.value++;
-
-                            }
-                            // 否则显示异常不处理即可
-                            else {
-                                closeToast();
-                                showNotify({
-                                    message: 'something wrong',
-                                    type: 'warning',
-                                    duration: 1500
-                                })
-
-                            }
-
-                        })
-                }
-                
-            }
-        }
-        const toggle = (id) => {
-            showLoadingToast({forbidClick: true});
-            // console.log(id);
-            let index = checkedId.indexOf(id);
-            // 不为-1则有，有则已被选中，那么取消选中
-            if(index !=- 1 ) {
-                checkedId.splice(index, 1);
-            }
-            // 否则为-1则没有，没有则未被选中，则加入
-            else {
-                checkedId.push(id);
-            }
-            checkedCart({cart_ids: checkedId}).then(res=>{
-                // {cart_ids: checkedId}
-                // console.log(res);
-
-                // 成功直接关闭toast提示
+        // 步进器加减控制
+        const addItemNum = (index) => {
+            showLoadingToast({ forbidClick: true });
+            let oldNum = state.cartList[index].num;
+            modifyCart(state.cartList[index].id, { num: oldNum+1 }).then(res => {
                 if (res.status == '204') {
                     closeToast();
                 }
-
-                // 失败，则需要更改数据后关闭toast并提示错误
                 else {
-                    // 失败数据库未发生变更，则旧的checkedId与其保持一致
-                    // 为-1则id被加入，删除即可
-                    if (index==-1) {
-                        checkedId.splice(checkedId.indexOf(id), 1);
-                    }
-                    // 否则是被删除，再加入回来
-                    else {
-                        checkedId.push(id);
-                    }
-                    
+                    state.cartList[index].num--;
                     closeToast();
                     showNotify({
                         message: 'something wrong',
-                        type: 'warning',
-                        duration: 1500
+                        duration: 1500,
+                        type: 'warning'
                     })
-
-
                 }
-            });
+            })
+        }
+        const subItemNum = (index) => {
+            showLoadingToast({ forbidClick: true });
+            let oldNum = state.cartList[index].num;
+            modifyCart(state.cartList[index].id, { num: oldNum-1 }).then(res => {
+                if (res.status == '204') {
+                    closeToast();
+                }
+                else {
+                    state.cartList[index].num++;
+                    closeToast();
+                    showNotify({
+                        message: 'something wrong',
+                        duration: 1500,
+                        type: 'warning'
+                    })
+                }
+            })
+        }
 
-        };
+        // 按钮选则时提交给服务器
+        const groupChange = (check) => {
+            showLoadingToast({ forbidClick: true });
+            if (check.length == state.cartList.length) {
+                state.toggleAllChecked = true;
+            }
+            else {
+                state.toggleAllChecked = false;
 
-        // 拦截处理商品数量加减
-        const stepperBeforeChange = (index) => {
-            let i = index;
-            return function(value) {
-                // console.log(i, value);
-                showLoadingToast({forbidClick: true});
-                modifyCart(cartList[index].id, {num: value}).then(res=>{
-                    // console.log(res);
-                    if(res.status == '204') {
-                        // console.log('value: ' + value);
-                        // console.log('cartList num: ' + cartList[index].num);
+            }
+            checkedCart({ cart_ids: check }).then(res => {
+                if (res.status == '204') {
+                    closeToast();
+                }
+                else {
+                    closeToast();
+                    showNotify({
+                        message: 'something wrong',
+                        duration: 1500,
+                        type: 'warning'
+                    })
+                    setTimeout(() => {
+                        router.go(0);
+                    }, 1500);
+                }
+            })
+        }
+        // 全选按钮
+        const toggleAll = () => {
+            // state.toggleAllChecked = !state.toggleAllChecked;
+            if (state.toggleAllChecked) {
+                state.checkedId = state.cartList.map(item => item.id);
+            }
+            else {
+                state.checkedId = [];
+            }
+        }
 
-                        // value大于存储的num，点了加号按钮，则购物车数量直接+1
-                        if (value > cartList[index].num) {
-                            store.commit('cartCountAdd');
-                        }
-                        // value小于存储的num，点了减号按钮，则购物车数量直接-1
-                        else if(value < cartList[index].num) {
-                            store.commit('cartCountSub');
-                        }
-                        // 无论如何都让cartList的num等于当前值
-                        cartList[index].num = value;
-                        closeToast();
-                        
-                    }else {
-                        closeToast();
-                        showNotify('something wrong');
-                        return new Promise((resolve)=>{
-                            resolve(false);
-                        })
-                    }
+        // 删除某个商品
+        const deleteGood = (id) => {
+            showLoadingToast({forbidClick: true})
+            deleteCartItem(id).then(res => {
+                console.log(res);
+                if (res.status == '204') {
+                    init();
+                    closeToast();
+                }
+                else {
+                    closeToast();
+                    showNotify({
+                        message: 'something wrong!',
+                        duration: 1500,
+                        type: "warning"
+                    })
+                }
+            })
+        }
+
+        // 总价
+        const totalPrice = computed(() => {
+            let sum = 0;
+            state.cartList.filter(item => state.checkedId.includes(item.id))
+                .forEach(item => {
+                    sum += parseInt(item.num) * parseFloat(item.goods.price);
                 })
 
-
-                // return new Promise((resolve)=>{
-                //     resolve(false);
-                // })
-            }
-        };
-
-        onMounted(()=>{
-            // 初始化数据
-            getCartData().then(res=>{
-                // console.log(res);
-                // 购物车数据添加
-                cartList.push(...res.data);
-                // console.log(cartList);
-                // 获取购物车每个商品的详细信息
-                for(let index in cartList) {
-                    // console.log(cartList[index]);
-
-                    // 确定被勾选的商品
-                    if (cartList[index].is_checked == 1) {
-                        checkedId.push(cartList[index].id);
-                    }
-
-                    showItem[index] = true;
-                    
-
-                    // 获取商品详情
-                    getDetail(cartList[index].goods_id).then(res=>{
-                        // console.log(res);
-                        cartList[index].title = res.goods.title;
-                        cartList[index].cover_url = res.goods.cover_url;
-                        cartList[index].price = res.goods.price;
-                        cartList[index].stock = res.goods.stock;
-
-                    })
-
-                }
-                // console.log(showItem);
-
-
-                
-            })
-
-            
+            return sum * 100;
         })
-        
+
 
         return {
-            cartList,
-            checkedId,
-            showItem,
-            toggleAllChecked,
-            checkboxGroup,
-            totalPrice,
-            stepperBeforeChange,
-            toggle,
-            beforeCardClose,
+            ...toRefs(state),
             toDetail,
-            toggleAll,
             onSubmit,
+            addItemNum,
+            subItemNum,
+            groupChange,
+            toggleAll,
+            deleteGood,
+            totalPrice
         }
     }
     
@@ -503,5 +358,9 @@ export default {
 
 .itemGoodsDeleteBtn {
     height: 100%;
+}
+
+.failToSubmit {
+    width: 50vw;
 }
 </style>

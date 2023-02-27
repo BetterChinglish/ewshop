@@ -34,7 +34,7 @@
     </div>
     <van-popup v-model:show="show" :style="{ padding: '50px' }" class="myPopup">
         <van-button type="default" class="cancleBtn" @click="cancelClick">取 消</van-button>
-        <van-button type="danger" @click="sureToDelete">确 认</van-button>
+        <van-button type="danger" @click="sureToDelete">确认删除</van-button>
     </van-popup>
 
 </div>
@@ -211,7 +211,7 @@ export default {
     }
 
     .van-button {
-        width: 86px;
+        width: 90px;
     }
 }
 </style>
