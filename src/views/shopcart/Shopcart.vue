@@ -151,7 +151,7 @@ export default {
             // console.log('on submit');
             if (state.checkedId.length == 0) {
                 showToast({
-                    message: '请至少选中一样商品进行结算',
+                    message: '请至少选中一样商品结算',
                     type: 'fail',
                     className: 'failToSubmit'
                 })
