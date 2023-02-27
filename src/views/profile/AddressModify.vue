@@ -4,7 +4,7 @@
         <!-- <template v-slot:left>
         </template> -->
         <template v-slot:default>
-            地址管理
+            地址修改
         </template>
         <!-- <template v-slot:right>
         </template> -->
@@ -23,11 +23,14 @@
         -->
         <van-address-edit
             :area-list="areaList"
+            show-delete
             show-set-default
             show-search-result
+            :address-info="addressInfo"
             :area-columns-placeholder="['请选择', '请选择', '请选择']"
             @save="onSave"
             @delete="onDelete"
+
         />
     </div>
     
@@ -37,19 +40,61 @@
 
 <script>
 import NavBar from '@/components/common/navbar/NavBar.vue';
-import { onMounted, reactive, ref, toRefs } from 'vue';
-import { closeToast, showLoadingToast, showNotify, showToast } from 'vant';
-import { addressData, addAddress } from 'network/address.js'
+import { closeToast, showLoadingToast, showNotify, showSuccessToast, showToast } from 'vant';
+import { addressData, addAddress, getAddressDetail } from 'network/address.js'
 import { areaList } from '@vant/area-data';
-import router from '@/router';
+import { useRoute, useRouter } from 'vue-router';
+import { reactive, onMounted } from 'vue';
+import { deleteAddress } from '@/network/address';
 export default {
-    name: 'AddressEdit',
+    name: 'AddressModify',
     components: {
         NavBar
     },
 
     setup() {
+        const route = useRoute();
+        const router = useRouter();
+        const addressId = route.query.id;  
         
+        const addressInfo = reactive({
+            name: '',
+            tel: '',
+            province: '',
+            city: '',
+            county: '',
+            addressDetail: '',
+            areaCode: '',
+            isDefault: false
+        })
+
+        onMounted(() => {
+            showLoadingToast({ forbidClick: true });
+            
+            
+            getAddressDetail(addressId).then(res => {
+                let areaCode = '';
+                Object.entries(areaList.county_list).forEach(([id, text]) => {
+                    if (text == res.county) {
+                        areaCode = id;
+                    }
+                })
+                console.log(res);
+                console.log(areaList);
+                addressInfo.name = res.name;
+                addressInfo.tel = res.phone;
+                addressInfo.province = res.province;
+                addressInfo.city = res.city;
+                addressInfo.county = res.county;
+                addressInfo.addressDetail = res.address;
+                addressInfo.isDefault = res.is_default == 1;
+                addressInfo.areaCode = areaCode;
+                closeToast();
+
+            })
+
+        });
+
         const onSave = (val) => {
             showLoadingToast({ forbidClick: true });
             console.log(val);
@@ -98,14 +143,31 @@ export default {
             
         };
 
-       
-        const onDelete = () => showToast('delete');
+        const onDelete = () => {
+            showLoadingToast({ forbidClick: true });
+            deleteAddress(addressId).then(res => {
+                console.log(res);
+                if (res.status == '204') {
+                    closeToast();
+                    showToast({
+                        message: '删除成功！',
+                        duration: 1000,
+                        type: 'success'
+                    })
+                    setTimeout(() => {
+                        router.push({
+                            path: '/address'
+                        })
+                    }, 1000);
+                }
+            })
+        };
 
         return {
             onSave,
             onDelete,
             areaList,
-
+            addressInfo,
         };
     },
 }

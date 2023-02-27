@@ -170,7 +170,7 @@ export default {
         const totalPrice = computed(() => {
             let price = 0;
             if (cartList.length == 0) {
-                return 0;
+                return price;
             }
             else {
                 for (let index in cartList) {

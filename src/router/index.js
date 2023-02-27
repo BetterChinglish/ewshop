@@ -10,6 +10,7 @@ const Register = () => import(/* webpackChunkName: "Register" */ '../views/profi
 const Login = () => import(/* webpackChunkName: "Login" */ '../views/profile/Login.vue');
 const Address = () => import(/* webpackChunkName: "Address" */ '../views/profile/Address.vue');
 const AddressEdit = () => import(/* webpackChunkName: "AddressEdit" */ '../views/profile/AddressEdit.vue');
+const AddressModify = () => import(/* webpackChunkName: "AddressModify" */ '../views/profile/AddressModify.vue');
 
 const routes = [
   {
@@ -100,6 +101,16 @@ const routes = [
     component: AddressEdit,
     meta: {
       title: '地址编辑',
+      isAuthRequired: true
+    }
+  },
+
+  {
+    path: '/addressmodify',
+    name: 'AddressModify',
+    component: AddressModify,
+    meta: {
+      title: '地址修改',
       isAuthRequired: true
     }
   },

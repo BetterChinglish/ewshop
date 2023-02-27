@@ -29,10 +29,10 @@
 
 <script scoped>
 import { computed, onMounted, reactive, ref } from 'vue';
-import { showToast } from 'vant';
+import { closeToast, showLoadingToast, showToast } from 'vant';
 import NavBar from '@/components/common/navbar/NavBar.vue';
 import { getAddressList } from '@/network/address';
-import router from '@/router';
+import { useRouter } from 'vue-router';
 
 export default {
     name: 'Address',
@@ -41,7 +41,11 @@ export default {
     },
 
     setup() {
+
+        // 选中
         const chosenAddressId = ref();
+
+        // 地址信息
         const list = reactive([]);
         // [{
         //     id: '1',
@@ -50,7 +54,8 @@ export default {
         //     address: '浙江省杭州市西湖区文三路 138 号东方通信大厦 7 楼 501 室',
         //     isDefault: true,
         // }]
-       
+
+        const router = useRouter();
             
         // 添加地址
         const onAdd = () => {
@@ -58,9 +63,20 @@ export default {
                 path: '/addressedit'
             })
         };
-        const onEdit = (item, index) => showToast('编辑地址:' + index);
+        const onEdit = (item, index) => {
+            // console.log(list[index].id);
+            router.push({
+                path: '/addressmodify',
+                query: {
+                    id: list[index].id
+                }
+            })
+        };
+        
 
         onMounted(() => {
+            showLoadingToast({ forbidClick: true });
+
             getAddressList().then(res => {
                 list.push(...res.data);
                 for (let i = 0; i < list.length; i++) {
@@ -78,6 +94,8 @@ export default {
                 if (chosenAddressId.value == null && list.length!=0) {
                     chosenAddressId.value = list[0].id;
                 }
+
+                closeToast();
             })
         })
         return {
