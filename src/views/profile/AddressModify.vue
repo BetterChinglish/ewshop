@@ -30,22 +30,24 @@
             :area-columns-placeholder="['请选择', '请选择', '请选择']"
             @save="onSave"
             @delete="onDelete"
-
         />
     </div>
-    
+    <van-popup v-model:show="show" :style="{ padding: '50px' }" class="myPopup">
+        <van-button type="default" class="cancleBtn" @click="cancelClick">取 消</van-button>
+        <van-button type="danger" @click="sureToDelete">确 认</van-button>
+    </van-popup>
 
 </div>
 </template>
 
 <script>
 import NavBar from '@/components/common/navbar/NavBar.vue';
-import { closeToast, showLoadingToast, showNotify, showSuccessToast, showToast } from 'vant';
+import { closeToast, showFailToast, showLoadingToast, showNotify, showSuccessToast, showToast } from 'vant';
 import { addressData, addAddress, getAddressDetail } from 'network/address.js'
 import { areaList } from '@vant/area-data';
 import { useRoute, useRouter } from 'vue-router';
-import { reactive, onMounted } from 'vue';
-import { deleteAddress } from '@/network/address';
+import { ref, reactive, onMounted } from 'vue';
+import { deleteAddress, editAddress } from '@/network/address';
 export default {
     name: 'AddressModify',
     components: {
@@ -55,8 +57,11 @@ export default {
     setup() {
         const route = useRoute();
         const router = useRouter();
+
+        // 保存地址id
         const addressId = route.query.id;  
-        
+
+        // 保存地址信息
         const addressInfo = reactive({
             name: '',
             tel: '',
@@ -68,6 +73,40 @@ export default {
             isDefault: false
         })
 
+        // 控制点击删除按钮时的弹出层
+        const show = ref(false);
+
+        const cancelClick = () => {
+            show.value = false;
+        }
+
+        const sureToDelete = () => {
+            showLoadingToast({ forbidClick: true });
+            deleteAddress(addressId).then(res => {
+                console.log(res);
+                if (res.status == '204') {
+                    closeToast();
+                    showToast({
+                        message: '删除成功！',
+                        duration: 1000,
+                        type: 'success'
+                    })
+                    setTimeout(() => {
+                        router.push({
+                            path: '/address'
+                        })
+                    }, 1000);
+                }
+                else {
+                    closeToast();
+                    showNotify({
+                        message: 'something wrong!',
+                        duration: 1500,
+                        type: 'warning'
+                    })
+                }
+            })
+        }
         onMounted(() => {
             showLoadingToast({ forbidClick: true });
             
@@ -79,8 +118,8 @@ export default {
                         areaCode = id;
                     }
                 })
-                console.log(res);
-                console.log(areaList);
+                // console.log(res);
+                // console.log(areaList);
                 addressInfo.name = res.name;
                 addressInfo.tel = res.phone;
                 addressInfo.province = res.province;
@@ -97,19 +136,19 @@ export default {
 
         const onSave = (val) => {
             showLoadingToast({ forbidClick: true });
-            console.log(val);
-            let address = '';
-            if (val.province[2] == '市') {
-                address = val.city + val.county + ' ' +val.addressDetail;
-            }
-            else {
-                address = val.province + val.city + val.county + ' ' + val.addressDetail;
-            }
+            // console.log(val);
+            // let address = '';
+            // if (val.province[2] == '市') {
+            //     address = val.city + val.county + ' ' +val.addressDetail;
+            // }
+            // else {
+            //     address = val.province + val.city + val.county + ' ' + val.addressDetail;
+            // }
 
 
-            addAddress({
+            editAddress(addressId, {
                 name: val.name,
-                address: address,
+                address: val.addressDetail,
                 phone: val.tel,
                 province: val.province,
                 city: val.city,
@@ -117,10 +156,10 @@ export default {
                 is_default: val.isDefault ? 1 : 0
             }).then(res => {
                 // console.log(res);
-                if (res.status == '201') {
+                if (res.status == '204') {
                     closeToast();
                     showToast({
-                        message: '添加成功!',
+                        message: '修改成功!',
                         duration: 1000,
                         type: 'success'
                     });
@@ -144,23 +183,7 @@ export default {
         };
 
         const onDelete = () => {
-            showLoadingToast({ forbidClick: true });
-            deleteAddress(addressId).then(res => {
-                console.log(res);
-                if (res.status == '204') {
-                    closeToast();
-                    showToast({
-                        message: '删除成功！',
-                        duration: 1000,
-                        type: 'success'
-                    })
-                    setTimeout(() => {
-                        router.push({
-                            path: '/address'
-                        })
-                    }, 1000);
-                }
-            })
+            show.value = true;
         };
 
         return {
@@ -168,13 +191,27 @@ export default {
             onDelete,
             areaList,
             addressInfo,
+            show,
+            cancelClick,
+            sureToDelete,
         };
     },
 }
 </script>
 
-<style>
+<style lang="scss">
 .editAddress {
     margin-top: 50px;
+}
+
+.myPopup {
+    border-radius: 10% / 15%;
+    .cancleBtn {
+        margin-right: 30px;
+    }
+
+    .van-button {
+        width: 86px;
+    }
 }
 </style>

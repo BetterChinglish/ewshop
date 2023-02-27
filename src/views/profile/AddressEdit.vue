@@ -53,18 +53,18 @@ export default {
         const onSave = (val) => {
             showLoadingToast({ forbidClick: true });
             console.log(val);
-            let address = '';
-            if (val.province[2] == '市') {
-                address = val.city + val.county + ' ' +val.addressDetail;
-            }
-            else {
-                address = val.province + val.city + val.county + ' ' + val.addressDetail;
-            }
+            // let address = '';
+            // if (val.province[2] == '市') {
+            //     address = val.city + val.county + ' ' +val.addressDetail;
+            // }
+            // else {
+            //     address = val.province + val.city + val.county + ' ' + val.addressDetail;
+            // }
 
 
             addAddress({
                 name: val.name,
-                address: address,
+                address: val.addressDetail,
                 phone: val.tel,
                 province: val.province,
                 city: val.city,

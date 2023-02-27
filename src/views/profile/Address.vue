@@ -80,11 +80,22 @@ export default {
             getAddressList().then(res => {
                 list.push(...res.data);
                 for (let i = 0; i < list.length; i++) {
+                    // console.log(list[i]);
 
                     // 适配vant组件属性tel与isDefault
                     list[i].tel = computed(()=>list[i].phone)
                     list[i].isDefault = computed(()=>list[i].is_default == 1 ? true : false)
 
+                    // 修改显示的详细地址
+                    let address = '';
+                    if (list[i].province[2] == '市') {
+                        address = list[i].city + list[i].county + ' ' + list[i].address;
+                    }
+                    else {
+                        address = list[i].province + list[i].city + list[i].county + ' ' + list[i].address;
+                    }
+                    list[i].address = address;
+                    // console.log(address);
                     // 选中默认地址
                     if (list[i].is_default == 1) {
                         chosenAddressId.value = list[i].id;
@@ -126,5 +137,8 @@ export default {
 }
 .van-address-item__address {
     text-align: left;
+}
+.van-address-list__add {
+    background-color: #43b883;
 }
 </style>

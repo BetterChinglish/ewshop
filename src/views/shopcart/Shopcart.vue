@@ -165,6 +165,7 @@ export default {
                 toggleAllChecked.value = false;
             }
         })
+        const testprice = ref(0);
 
         // 总价
         const totalPrice = computed(() => {
@@ -453,7 +454,6 @@ export default {
             toggleAllChecked,
             checkboxGroup,
             totalPrice,
-
             stepperBeforeChange,
             toggle,
             beforeCardClose,
